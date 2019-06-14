@@ -8,12 +8,14 @@ public class User {
     private String userName;
     private ArrayList<Role> authRoles;
     private Role activeRole;
+    private Operation activeOp;
 
-    public User(int userId, String userName, ArrayList<Role> authRoles, Role activeRole) {
+    public User(int userId, String userName, ArrayList<Role> authRoles, Role activeRole, Operation activeOp) {
         this.userId = userId;
         this.userName = userName;
         this.authRoles = authRoles;
         this.activeRole = activeRole;
+        this.activeOp = activeOp;
     }
 
     public int getUserId() {
@@ -46,5 +48,13 @@ public class User {
 
     public void setActiveRole(Role activeRole) {
         this.activeRole = activeRole;
+    }
+
+    public Operation getActiveOp() {
+        return activeOp;
+    }
+
+    public void setActiveOp(Operation activeOp) {
+        this.activeOp = activeOp;
     }
 }
