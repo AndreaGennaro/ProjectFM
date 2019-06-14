@@ -37,4 +37,5 @@ public class Samuele {
     }
 
     public String generateCTLFormula(){}
+
 }

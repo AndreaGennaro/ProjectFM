@@ -2,18 +2,75 @@ package src.model;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-import src.model.elements.Session;
-import src.model.elements.User;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
-import java.util.ArrayList;
+
 
 public class ModelGenerator {
 
 
-    public static void parseStream() throws Exception {
+    public static void parseStream(Node node, int level) throws Exception {
+
+        //-----------------------------------------------------------------------------------------------------------------------------------------
+        // Spaziatura ad albero per i livelli
+        String space = "";
+        for (int j = 0; j <= level; j++)
+            if(level == 0)
+                space += "\n         ";
+            else
+                space += "          ";
+        //-----------------------------------------------------------------------------------------------------------------------------------------
+
+        // PASSO RICORSIVO:
+        // Se il nodo ha figli
+        if(node.getChildNodes().getLength() > 0)
+            for(int i = 0; i <= node.getChildNodes().getLength(); i++) {
+
+                Node element = node.getChildNodes().item(i);
+
+
+                if(element != null) {
+                    if (element.getNodeType() == Node.ELEMENT_NODE){
+
+
+
+                        System.out.println("\n"+space + "-->Nome dell'elemento: " + element.getNodeName());
+
+                        //-----------------------------------------------------------------------------------------------------------------------------------------
+                        // Se ci sono attributi legati a questo elemento li stampo
+                        if (element.hasAttributes()) {
+                            for (int k = 0; k < element.getAttributes().getLength(); k++) {
+
+                                Node attribute = element.getAttributes().item(k);
+
+                                if (!attribute.getTextContent().equals(""))
+                                    System.out.println(space + "   Nome dell'attributo: " + attribute.getNodeName() + "    Testo = " + attribute.getTextContent());
+                                else
+                                    System.out.println(space + "   Nome dell'attributo: " + attribute.getNodeName() + "    Testo = vuoto");
+
+                            }
+                        }
+                        //-----------------------------------------------------------------------------------------------------------------------------------------
+
+                        // CASO BASE:
+                        // Se il nodo ha un solo figlio, ed è anche un figlio di tipo text, allora l'algoritmo non scende nella ricorione
+                        // e stampo il contenuto del figlio testuale
+                        if((element.getChildNodes().getLength() == 1) && (element.getChildNodes().item(0).getNodeType() == Node.TEXT_NODE))
+                            System.out.println(space + "   contenuto testuale foglia = " + element.getChildNodes().item(0).getTextContent());
+
+                        // Si scende nell'albero se si ha almeno un figlio non testuale
+                        else if (element.getChildNodes().getLength() > 0)
+                            parseStream(element, level + 1);
+                    }
+                }
+
+            }
+    }
+
+
+
+    public static void main(String[] args) throws Exception {
         // Costruiamo una factory per processare il nostro flusso di dati
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 
@@ -26,29 +83,10 @@ public class ModelGenerator {
         // Prendiamo il primo nodo - come suggerisce il metodo - la radice
         Node root = doc.getFirstChild();
 
-        // Iteriamo per ogni nodo presente nella lista dei nodi della radice
-        for (int i = 0; i < root.getChildNodes().getLength(); i++) {
-            // Sapendo che il primo nodo è il nodo libro procediamo iterando nei suoi nodi figli
-            Node libro = root.getChildNodes().item(i);
+        System.out.println("\n\nNome dell'elemento radice: " + root.getNodeName());
 
-            //Se il nodo è un Elemento allora ne stampiamo il nome, il testo contenuto e gli attributi se presenti
-            for (int j = 0; j < libro.getChildNodes().getLength(); j++) {
-                Node element = libro.getChildNodes().item(j);
-                if (element.getNodeType() == Node.ELEMENT_NODE) {
-                    System.out.println("\n\nNome dell'elemento: " + element.getNodeName() + "\n     Testo = " + element.getTextContent());
-                    if (element.hasAttributes()) {
-                        for (int k = 0; k < element.getAttributes().getLength(); k++) {
-                            Node attribute = element.getAttributes().item(k);
-                            System.out.print("\t              Nome dell'attributo: " + attribute.getNodeName() + " - Valore del testo = " + attribute.getTextContent());
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    public static void main(String[] args) throws Exception {
-        parseStream();
+        //Si parte con la ricorsione dalla radice
+        parseStream(root, 0);
     }
 
     /*
