@@ -10,7 +10,7 @@ public class Samuele {
     *
     *verify that all users that can execute an operation have an active role
     * */
-    private String roass(){
+/*    private String roass(){
         for (User u : session.getUsers()) {
 
         }
@@ -20,7 +20,7 @@ public class Samuele {
      *
      *verify that all the active roles of users are also authorized
      * */
-    private String roaut(){
+/*    private String roaut(){
 
     }
 
@@ -28,7 +28,7 @@ public class Samuele {
      *
      *verify that operations executed by users are always authorized for the active role
      * */
-    private String rota(){
+ /*   private String rota(){
 
     }
 
@@ -37,5 +37,5 @@ public class Samuele {
     }
 
     public String generateCTLFormula(){}
-
+*/
 }

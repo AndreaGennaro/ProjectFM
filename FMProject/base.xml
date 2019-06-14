@@ -1,39 +1,44 @@
 <session>
 
     <objects>
-        <object id="">
+        <object id="1">
             <name>Obj name</name>
         </object>
     </objects>
 
     <operations>
-        <operation id="">
+        <operation id="1">
             <name>Op name</name>
-            <type>Op type</type>
+            <description>Op description</description>
         </operation>
     </operations>
 
     <permissions>
-        <permission id="">
-            <object>object id</object>
-            <operation>Op id</operation>
+        <permission id="1">
+            <object>1</object>
+            <operation>1</operation>
         </permission>
     </permissions>
 
     <roles>
         <role id="1">
-            <name>src.model.elements.Role name</name>
+            <name>Role name</name>
             <permissions>
-                <permission>permission id</permission>
+                <permission id="1">
+                    <object>1</object>
+                    <operation>1</operation>
+                </permission>
             </permissions>
         </role>
     </roles>
 
-    <user id="">
-        <name>src.model.elements.User name</name>
-        <roles>
-            <role status="">role id</role>
-        </roles>
-    </user>
+    <users>
+        <user id="1">
+            <name>User name</name>
+            <roles>
+                <role status="">1</role>
+            </roles>
+        </user>
+    </users>
 
 </session>
