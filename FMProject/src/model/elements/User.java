@@ -7,9 +7,9 @@ public class User {
     private int userId;
     private String userName;
     private ArrayList<Role> authRoles;
-    private Integer activeRole;
+    private Role activeRole;
 
-    public User(int userId, String userName, ArrayList<Role> authRoles, Integer activeRole) {
+    public User(int userId, String userName, ArrayList<Role> authRoles, Role activeRole) {
         this.userId = userId;
         this.userName = userName;
         this.authRoles = authRoles;
@@ -40,11 +40,11 @@ public class User {
         this.authRoles = authRoles;
     }
 
-    public Integer getActiveRole() {
+    public Role getActiveRole() {
         return activeRole;
     }
 
-    public void setActiveRole(Integer activeRole) {
+    public void setActiveRole(Role activeRole) {
         this.activeRole = activeRole;
     }
 }
