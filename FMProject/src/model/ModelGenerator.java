@@ -23,17 +23,7 @@ public class ModelGenerator {
     private static ArrayList<Operation> OperationList = new ArrayList<Operation>();
 
 
-    public static void parseStream(Node node, int level, String type, String output) throws Exception {
-
-        //-----------------------------------------------------------------------------------------------------------------------------------------
-        // Spaziatura ad albero per i livelli
-        String space = "";
-        for (int j = 0; j <= level; j++)
-            if(level == 0)
-                space += "\n         ";
-            else
-                space += "          ";
-        //-----------------------------------------------------------------------------------------------------------------------------------------
+    public static void parseStream(Node node, int level, String type) throws Exception {
 
         // PASSO RICORSIVO:
         // Se il nodo ha figli
@@ -53,9 +43,6 @@ public class ModelGenerator {
                             type = element.getNodeName();
                         }
 
-                        // Stampo il nome dell'i-esimo elemento
-                        System.out.print("\n\n" + space + "-->Nome dell'elemento: " + element.getNodeName());
-
                         //-----------------------------------------------------------------------------------------------------------------------------------------
                         // NEW OBJECT
                         // Se sto scorrendo la lista degli oggetti e devo aggiungere al sistema l'elemento attuale come oggetto
@@ -71,7 +58,7 @@ public class ModelGenerator {
                             RBACObject o = new RBACObject( ObjectId, ObjectName);
                             RBACObjectList.add(o);
 
-                            System.out.print("      ****oggetto creato: " + " id = " + o.getObjectId() + "    nome = " + o.getObjectName() + "***");
+                            System.out.println(" new OBJECT: " + "\n        id = " + o.getObjectId() + "\n        name = " + o.getObjectName() + "\n");
                         }
                         //-----------------------------------------------------------------------------------------------------------------------------------------
                         // NEW OPERATION
@@ -91,7 +78,7 @@ public class ModelGenerator {
                             Operation o = new Operation( OperationId, OperationName, OperationDescription);
                             OperationList.add(o);
 
-                            System.out.print("      ****operazione creata: " + " id = " + o.getOperationId() + "    nome = " + o.getName() + "    descrizione = " + o.getDescription() + "***");
+                            System.out.println(" new OPERATION: " + "\n        id = " + o.getOperationId() + "\n        name = " + o.getName() + "\n        description = " + o.getDescription() + "\n");
                         }
                         //-----------------------------------------------------------------------------------------------------------------------------------------
                         // NEW PERMISSION
@@ -107,25 +94,10 @@ public class ModelGenerator {
                             // mi ricavo l'id dell'operazione associata al permesso
                             int OperationId = Integer.parseInt(element.getChildNodes().item(3).getTextContent());
 
-                            // inizializzo l'oggetto di cui mi ricaverò il nome dalla lista statica
-                            RBACObject RBACo = new RBACObject(RBACObjectId,"");
+                            // createPermission mi crea e ritorna l'oggetto permesso conoscendo l'id dell'oggetto, dell'operazione e del nuovo permesso
+                            Permission p = createPermission(RBACObjectId,OperationId,PermissionId);
 
-                            for (RBACObject obj: RBACObjectList) {
-                                if(obj.getObjectId() == RBACObjectId)
-                                    RBACo = obj;
-                            }
-
-                            // inizializzo il permesso di cui mi ricaverò il nome e la descrizione dalla lista statica
-                            Operation operationP = new Operation(OperationId,"", "");
-
-                            for (Operation op: OperationList) {
-                                if(op.getOperationId() == OperationId)
-                                    operationP = op;
-                            }
-
-                            // istanzio il nuovo oggetto permesso
-                            Permission p = new Permission( PermissionId, RBACo, operationP);
-                            System.out.print("      ****permesso creato: " + " id = " + p.getId() + "    id_oggetto = " + p.getRBACObject().getObjectId() + "    id_operazione = " + p.getOperation().getOperationId() + "***");
+                            System.out.println(" new PERMISSION: " + "\n        id = " + p.getId() + "\n        object_id = " + p.getRBACObject().getObjectId() + "\n        operation_id = " + p.getOperation().getOperationId() + "\n");
                         }
                         //-----------------------------------------------------------------------------------------------------------------------------------------
                         // NEW ROLE
@@ -146,6 +118,8 @@ public class ModelGenerator {
                             // mi salvo il nodo permissions dell'xml, che ha come sotto-elementi la lista dei permessi associati al ruolo
                             Node permissions = element.getChildNodes().item(3);
 
+                            String outPermission = "";
+
                             // mi ricavo la lista dei permessi associati al ruolo
                             for (int k = 0; k < permissions.getChildNodes().getLength(); k++) {
 
@@ -161,25 +135,8 @@ public class ModelGenerator {
                                     // mi ricavo l'id dell'operazione associata al permesso
                                     int OperationId = Integer.parseInt(permissions.getChildNodes().item(k).getChildNodes().item(3).getTextContent());
 
-                                    // inizializzo l'oggetto di cui mi ricaverò il nome dalla lista statica
-                                    RBACObject RBACo = new RBACObject(RBACObjectId,"");
-
-                                    for (RBACObject obj: RBACObjectList) {
-                                        if(obj.getObjectId() == RBACObjectId)
-                                            RBACo = obj;
-                                    }
-
-                                    // inizializzo il permesso di cui mi ricaverò il nome e la descrizione dalla lista statica
-                                    Operation operationP = new Operation(OperationId,"", "");
-
-                                    for (Operation op: OperationList) {
-                                        if(op.getOperationId() == OperationId)
-                                            operationP = op;
-                                    }
-
-                                    // creo e aggiungo il nuovo permesso alla lista dei permessi del ruolo considerato
-                                    Permission p = new Permission(PermissionId, RBACo, operationP);
-                                    PermissionList.add(p);
+                                    // createPermission mi ricostruisce e ritorna l'oggetto permesso conoscendo l'id dell'oggetto, dell'operazione e del nuovo permesso
+                                    Permission p = createPermission(RBACObjectId,OperationId,PermissionId);
 
                                     // aggiorno il ruolo r con la lista dei permessi associati
                                     r = new Role(RoleId, RoleName, PermissionList);
@@ -187,11 +144,12 @@ public class ModelGenerator {
                                     // aggiungo r alla lista dei ruoli
                                     RoleList.add(r);
 
-                                    System.out.print("      ****permesso aggiunto al ruolo: " + " id_permesso = " + p.getId() + "    id_oggetto = " + p.getRBACObject().getObjectId() + "    id_operazione = " + p.getOperation().getOperationId() + "***");
-
+                                    outPermission += "        permission added to the role: " + "\n                   permission_id = " + p.getId() + "\n                   object_id = " + p.getRBACObject().getObjectId() + "\n                   operation_id = " + p.getOperation().getOperationId() + "\n";
                                 }
                             }
-                            System.out.print("      ****ruolo creato: " + " id = " + r.getRoleId() + "    nome = " + r.getRoleName() + "***");
+
+                            System.out.println(" new ROLE: " + "\n        id = " + r.getRoleId() + "\n        name = " + r.getRoleName() + "\n" + outPermission);
+
                         }
 
                         //-----------------------------------------------------------------------------------------------------------------------------------------
@@ -211,6 +169,8 @@ public class ModelGenerator {
                             // mi salvo il nodo roles dell'xml, che ha come sotto-elementi la lista dei ruoli autorizzati per l'utente considerato
                             Node roles = element.getChildNodes().item(3);
 
+                            String outUser = "";
+
                             // mi ricavo la lista dei ruoli associati all'utente
                             for (int k = 0; k < roles.getChildNodes().getLength(); k++) {
 
@@ -223,48 +183,53 @@ public class ModelGenerator {
                                     for (Role r: RoleList) {
                                         if(RoleId == r.getRoleId()) {
                                             UserRoleList.add(r);
-                                            System.out.print("      ****ruolo autorizzato aggiunto all'utente creato: " + " id_ruolo = " + r.getRoleId() + "    nome_ruolo = " + r.getRoleName() + "***");
+
+                                            outUser += "        authorized role added to the user: " + "\n                   role_id = " + r.getRoleId() + "\n                   role_name = " + r.getRoleName() + "\n";
                                         }
                                     }
                                 }
                             }
 
+
                             //DA FINIRE POI CON LOROOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
                             // ruolo attivo e operazione a cavolo!!!
-                           User u = new User(UserId, UserName, UserRoleList, UserRoleList.get(0),new Operation(1,"",""));
 
-                            System.out.print("      ****utente creato: " + " id = " + UserId + "    nome = " + UserName + "***");
+                            User u = new User(UserId, UserName, UserRoleList, UserRoleList.get(0),new Operation(1,"",""));
 
+                            System.out.println(" new USER: " + "\n        id = " + UserId + "\n        name = " + UserName + "\n" + outUser);
                         }
-                        //-----------------------------------------------------------------------------------------------------------------------------------------
-                        // Se ci sono attributi legati a questo elemento li stampo
-                        if (element.hasAttributes()) {
-                            for (int k = 0; k < element.getAttributes().getLength(); k++) {
 
-                                Node attribute = element.getAttributes().item(k);
-
-                                if (!attribute.getTextContent().equals(""))
-                                    System.out.print("\n" + space + "   Nome dell'attributo: " + attribute.getNodeName() + "    Testo = " + attribute.getTextContent());
-                                else
-                                    System.out.print("\n" + space + "   Nome dell'attributo: " + attribute.getNodeName() + "    Testo = vuoto");
-
-                            }
-                        }
-                        //-----------------------------------------------------------------------------------------------------------------------------------------
-
-                        // CASO BASE:
-                        // Se il nodo ha un solo figlio, ed è anche un figlio di tipo text, allora l'algoritmo non scende nella ricorione
-                        // e stampo il contenuto del figlio testuale
-                        if ((element.getChildNodes().getLength() == 1) && (element.getChildNodes().item(0).getNodeType() == Node.TEXT_NODE))
-                            System.out.println("    Testo = " + element.getChildNodes().item(0).getTextContent());
-
-                            // Si scende nell'albero se si ha almeno un figlio non testuale
-                        else if (element.getChildNodes().getLength() > 0)
-                            parseStream(element, level + 1, type, output);
+                        // Si scende nell'albero se si ha almeno un figlio non testuale
+                        if (element.getChildNodes().getLength() > 0)
+                            parseStream(element, level + 1, type);
                     }
                 }
             }
         }
+    }
+
+    // metodo statico che costruisce e ritorna un permesso
+    private static Permission createPermission(int RBACObjectId, int OperationId, int PermissionId){
+        // inizializzo l'oggetto di cui mi ricaverò il nome dalla lista statica
+        RBACObject RBACo = new RBACObject(RBACObjectId,"");
+
+        for (RBACObject obj: RBACObjectList) {
+            if(obj.getObjectId() == RBACObjectId)
+                RBACo = obj;
+        }
+
+        // inizializzo il permesso di cui mi ricaverò il nome e la descrizione dalla lista statica
+        Operation operationP = new Operation(OperationId,"", "");
+
+        for (Operation op: OperationList) {
+            if(op.getOperationId() == OperationId)
+                operationP = op;
+        }
+
+        // istanzio il nuovo oggetto permesso
+        Permission p = new Permission( PermissionId, RBACo, operationP);
+
+        return p;
     }
 
     public static void main(String[] args) throws Exception {
@@ -280,16 +245,15 @@ public class ModelGenerator {
         // Prendiamo il primo nodo - come suggerisce il metodo - la radice
         Node root = doc.getFirstChild();
 
-        System.out.println("\n\nNome dell'elemento radice: " + root.getNodeName());
-
-        String type = "session";
+        System.out.println("\n--------------------------------------------------------------------------------------------------------------\n new SESSION" +
+                "\n--------------------------------------------------------------------------------------------------------------\n");
 
         //Si parte con la ricorsione dalla radice
-        parseStream(root, 0, type, "");
+        parseStream(root, 0, "session");
     }
 
     /*
-    public Session createSession(String xmlFile){
+    public Session createSession(String xmlFilePath){
 
     }*/
 }
