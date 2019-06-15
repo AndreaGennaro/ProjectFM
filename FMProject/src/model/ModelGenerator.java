@@ -14,16 +14,16 @@ import java.util.ArrayList;
 public class ModelGenerator {
 
     // lista dei ruoli nel sistema
-    private static ArrayList<Role> RoleList = new ArrayList<Role>();
+    private static ArrayList<Role> RoleList = new ArrayList<>();
 
     // lista degli oggetti nel sistema
-    private static ArrayList<RBACObject> RBACObjectList = new ArrayList<RBACObject>();
+    private static ArrayList<RBACObject> RBACObjectList = new ArrayList<>();
 
     // lista delle operazioni nel sistema
-    private static ArrayList<Operation> OperationList = new ArrayList<Operation>();
+    private static ArrayList<Operation> OperationList = new ArrayList<>();
 
 
-    public static void parseStream(Node node, int level, String type) throws Exception {
+    private static void parseStream(Node node, int level, String type){
 
         // PASSO RICORSIVO:
         // Se il nodo ha figli
@@ -113,12 +113,12 @@ public class ModelGenerator {
                             // istanzio la lista dei permessi
                             ArrayList<Permission> PermissionList = new ArrayList<>();
 
-                            Role r = new Role(RoleId, RoleName, new ArrayList<Permission>());
+                            Role r = new Role(RoleId, RoleName, new ArrayList<>());
 
                             // mi salvo il nodo permissions dell'xml, che ha come sotto-elementi la lista dei permessi associati al ruolo
                             Node permissions = element.getChildNodes().item(3);
 
-                            String outPermission = "";
+                            StringBuilder outPermission = new StringBuilder();
 
                             // mi ricavo la lista dei permessi associati al ruolo
                             for (int k = 0; k < permissions.getChildNodes().getLength(); k++) {
@@ -144,7 +144,7 @@ public class ModelGenerator {
                                     // aggiungo r alla lista dei ruoli
                                     RoleList.add(r);
 
-                                    outPermission += "        permission added to the role: " + "\n                   permission_id = " + p.getId() + "\n                   object_id = " + p.getRBACObject().getObjectId() + "\n                   operation_id = " + p.getOperation().getOperationId() + "\n";
+                                    outPermission.append("        permission added to the role: " + "\n                   permission_id = ").append(p.getId()).append("\n                   object_id = ").append(p.getRBACObject().getObjectId()).append("\n                   operation_id = ").append(p.getOperation().getOperationId()).append("\n");
                                 }
                             }
 
@@ -169,7 +169,7 @@ public class ModelGenerator {
                             // mi salvo il nodo roles dell'xml, che ha come sotto-elementi la lista dei ruoli autorizzati per l'utente considerato
                             Node roles = element.getChildNodes().item(3);
 
-                            String outUser = "";
+                            StringBuilder outUser = new StringBuilder();
 
                             // mi ricavo la lista dei ruoli associati all'utente
                             for (int k = 0; k < roles.getChildNodes().getLength(); k++) {
@@ -184,7 +184,7 @@ public class ModelGenerator {
                                         if(RoleId == r.getRoleId()) {
                                             UserRoleList.add(r);
 
-                                            outUser += "        authorized role added to the user: " + "\n                   role_id = " + r.getRoleId() + "\n                   role_name = " + r.getRoleName() + "\n";
+                                            outUser.append("        authorized role added to the user: " + "\n                   role_id = ").append(r.getRoleId()).append("\n                   role_name = ").append(r.getRoleName()).append("\n");
                                         }
                                     }
                                 }
@@ -194,7 +194,7 @@ public class ModelGenerator {
                             //DA FINIRE POI CON LOROOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
                             // ruolo attivo e operazione a cavolo!!!
 
-                            User u = new User(UserId, UserName, UserRoleList, UserRoleList.get(0),new Operation(1,"",""));
+                            new User(UserId, UserName, UserRoleList, UserRoleList.get(0),new Operation(1,"",""));
 
                             System.out.println(" new USER: " + "\n        id = " + UserId + "\n        name = " + UserName + "\n" + outUser);
                         }
@@ -226,10 +226,8 @@ public class ModelGenerator {
                 operationP = op;
         }
 
-        // istanzio il nuovo oggetto permesso
-        Permission p = new Permission( PermissionId, RBACo, operationP);
-
-        return p;
+        // ritorno il nuovo oggetto permesso
+        return new Permission( PermissionId, RBACo, operationP);
     }
 
     public static void main(String[] args) throws Exception {
