@@ -24,7 +24,7 @@ public class ModelTranslator {
         // session = ModelGenerator.createSession();
 
         // Inizializzo le liste di oggetti che rappresentano la sessione
-        initializeLists(roles, objects, permissions, operations);
+        initializeLists();
 
         String nusmvCode = "";
 
@@ -101,7 +101,10 @@ public class ModelTranslator {
         return nusmvCode;
     }
 
-    private static void initializeLists(ArrayList<Role> roles, ArrayList<RBACObject> objects, ArrayList<Permission> permissions, ArrayList<Operation> operations) {
+    /**
+     * The method initialize all lists.
+     */
+    private static void initializeLists() {
         users = session.getUsers();
 
         for(User user : users){
@@ -122,6 +125,16 @@ public class ModelTranslator {
         }
     }
 
+    /**
+     * The method writes a new NuSMV module using the name, the variables and the domain provided
+     * by the developer. Also it defines the assignement and the next rule.
+     * @param name the name of the module
+     * @param variables the variable inside the module
+     * @param domains the list of domains, one for each variable
+     * @param assignment the list of assignments, one for each variable
+     * @param next the list of assignements for the next states.
+     * @return a string representing the module
+     */
     private static String generateModule(String name, String[] variables, String[] domains, String[] assignment, String[] next){
         String module = "MODULE " + name + "(";
 
@@ -149,6 +162,10 @@ public class ModelTranslator {
         return module;
     }
 
+    /**
+     * The method writes the user module
+     * @return the user module
+     */
     private static String generateUserModule(){
         return generateModule("user",
                 new String[]{"id", "activeOp"},
@@ -157,6 +174,10 @@ public class ModelTranslator {
                 new String[]{"id", "activeOp"});
     }
 
+    /**
+     * The method writes the role module
+     * @return the role module
+     */
     private static String generateRoleModule(){
         return generateModule(
                 "role",
@@ -166,6 +187,10 @@ public class ModelTranslator {
                 new String[]{"id"});
     }
 
+    /**
+     * The method writes the module wich connect users to roles
+     * @return the userRole module
+     */
     private static String generateUserRoleModule(){
         return generateModule("userRole",
                 new String[]{"user", "role", "active"},
@@ -174,6 +199,10 @@ public class ModelTranslator {
                 new String[]{"user", "role", "active"});
     }
 
+    /**
+     * The method writes the permission module
+     * @return the permission module
+     */
     private static String generatePermissionModule(){
         return generateModule(
                 "permission",
@@ -183,6 +212,10 @@ public class ModelTranslator {
                 new String[]{"id", "id", "id"});
     }
 
+    /**
+     * The method writes the object module
+     * @return the object module
+     */
     private static String generateObjectModule(){
         return generateModule(
                 "object",
@@ -192,6 +225,10 @@ public class ModelTranslator {
                 new String[]{"id"});
     }
 
+    /**
+     * The method writes the operation module.
+     * @return the operation module
+     */
     private static String generateOperationModule(){
         return generateModule(
                 "operation",
