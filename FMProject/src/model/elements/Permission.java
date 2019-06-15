@@ -3,12 +3,12 @@ package src.model.elements;
 public class Permission {
 
     private int id;
-    private int object;
-    private int operation;
+    private RBACObject RBACObject;
+    private Operation operation;
 
-    public Permission(int id, int object, int operation) {
+    public Permission(int id, RBACObject RBACObject, Operation operation) {
         this.id = id;
-        this.object = object;
+        this.RBACObject = RBACObject;
         this.operation = operation;
     }
 
@@ -20,19 +20,19 @@ public class Permission {
         this.id = id;
     }
 
-    public int getObject() {
-        return object;
+    public RBACObject getRBACObject() {
+        return RBACObject;
     }
 
-    public void setObject(int object) {
-        this.object = object;
+    public void setRBACObject(RBACObject RBACObject) {
+        this.RBACObject = RBACObject;
     }
 
-    public int getOperation() {
+    public Operation getOperation() {
         return operation;
     }
 
-    public void setOperation(int operation) {
+    public void setOperation(Operation operation) {
         this.operation = operation;
     }
 }

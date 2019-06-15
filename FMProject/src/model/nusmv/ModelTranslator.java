@@ -65,4 +65,8 @@ public class ModelTranslator {
                 new String[]{"user", "role", "state", "active"});
     }
 
+    private static String generatePermissionModule(){
+        return null;
+    }
+
 }

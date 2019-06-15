@@ -3,7 +3,7 @@ package src.model;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import src.model.elements.*;
-import src.model.elements.Object;
+import src.model.elements.RBACObject;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -59,7 +59,7 @@ public class ModelGenerator {
                             String ObjectName = element.getChildNodes().item(1).getTextContent();
 
                             // istanzio il nuovo oggetto
-                            Object o = new Object( ObjectId, ObjectName);
+                            RBACObject o = new RBACObject( ObjectId, ObjectName);
                             System.out.print("      ****oggetto creato: " + " id = " + o.getObjectId() + "    nome = " + o.getObjectName() + "***");
                         }
                         //-----------------------------------------------------------------------------------------------------------------------------------------
@@ -96,7 +96,7 @@ public class ModelGenerator {
 
                             // istanzio il nuovo oggetto permesso
                             Permission p = new Permission( PermissionId, ObjectId, OperationId);
-                            System.out.print("      ****permesso creato: " + " id = " + p.getId() + "    id_oggetto = " + p.getObject() + "    id_operazione = " + p.getOperation() + "***");
+                            System.out.print("      ****permesso creato: " + " id = " + p.getId() + "    id_oggetto = " + p.getRBACObject() + "    id_operazione = " + p.getOperation() + "***");
                         }
                         //-----------------------------------------------------------------------------------------------------------------------------------------
                         // NEW ROLE
@@ -142,7 +142,7 @@ public class ModelGenerator {
                                     // aggiungo r alla lista dei ruoli
                                     RoleList.add(r);
 
-                                    System.out.print("      ****permesso aggiunto al ruolo: " + " id_permesso = " + p.getId() + "    id_oggetto = " + p.getObject() + "    id_operazione = " + p.getOperation() + "***");
+                                    System.out.print("      ****permesso aggiunto al ruolo: " + " id_permesso = " + p.getId() + "    id_oggetto = " + p.getRBACObject() + "    id_operazione = " + p.getOperation() + "***");
 
                                 }
                             }

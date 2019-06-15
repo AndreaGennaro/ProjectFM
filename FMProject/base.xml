@@ -1,9 +1,9 @@
 <session>
 
     <objects>
-        <object id="1">
+        <RBACObject id="1">
             <name>Obj name</name>
-        </object>
+        </RBACObject>
     </objects>
 
     <operations>
@@ -15,7 +15,7 @@
 
     <permissions>
         <permission id="1">
-            <object>1</object>
+            <RBACObject>1</RBACObject>
             <operation>1</operation>
         </permission>
     </permissions>
@@ -25,7 +25,7 @@
             <name>Role name</name>
             <permissions>
                 <permission id="1">
-                    <object>1</object>
+                    <RBACObject>1</RBACObject>
                     <operation>1</operation>
                 </permission>
             </permissions>
