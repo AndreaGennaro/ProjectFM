@@ -13,8 +13,13 @@ import java.util.ArrayList;
 
 public class ModelGenerator {
 
+    // lista dei ruoli nel sistema
     private static ArrayList<Role> RoleList = new ArrayList<Role>();
+
+    // lista degli oggetti nel sistema
     private static ArrayList<RBACObject> RBACObjectList = new ArrayList<RBACObject>();
+
+    // lista delle operazioni nel sistema
     private static ArrayList<Operation> OperationList = new ArrayList<Operation>();
 
 
@@ -171,7 +176,6 @@ public class ModelGenerator {
                                         if(op.getOperationId() == OperationId)
                                             operationP = op;
                                     }
-
 
                                     // creo e aggiungo il nuovo permesso alla lista dei permessi del ruolo considerato
                                     Permission p = new Permission(PermissionId, RBACo, operationP);
