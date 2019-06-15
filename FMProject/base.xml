@@ -4,6 +4,10 @@
         <RBACObject id="1">
             <name>Obj name</name>
         </RBACObject>
+
+        <RBACObject id="2">
+            <name>Obj name2</name>
+        </RBACObject>
     </objects>
 
     <operations>
@@ -18,9 +22,15 @@
             <RBACObject>1</RBACObject>
             <operation>1</operation>
         </permission>
+
+        <permission id="2">
+            <RBACObject>2</RBACObject>
+            <operation>1</operation>
+        </permission>
     </permissions>
 
     <roles>
+
         <role id="1">
             <name>Role name</name>
             <permissions>
@@ -28,8 +38,23 @@
                     <RBACObject>1</RBACObject>
                     <operation>1</operation>
                 </permission>
+                <permission id="2">
+                    <RBACObject>2</RBACObject>
+                    <operation>1</operation>
+                </permission>
             </permissions>
         </role>
+
+        <role id="2">
+            <name>Role name2</name>
+            <permissions>
+                <permission id="1">
+                    <RBACObject>2</RBACObject>
+                    <operation>1</operation>
+                </permission>
+            </permissions>
+        </role>
+
     </roles>
 
     <users>
@@ -37,6 +62,7 @@
             <name>User name</name>
             <roles>
                 <role status="">1</role>
+                <role status="">2</role>
             </roles>
         </user>
     </users>

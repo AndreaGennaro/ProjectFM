@@ -55,7 +55,9 @@ public class ModelGenerator {
 
                             // istanzio il nuovo oggetto e lo aggiungo alla lista degli oggetti
                             RBACObject o = new RBACObject( ObjectId, ObjectName);
-                            RBACObjectList.add(o);
+
+                            if(!RBACObjectList.contains(o))
+                                RBACObjectList.add(o);
 
                             System.out.println(" new OBJECT: " + "\n        id = " + o.getObjectId() + "\n        name = " + o.getObjectName() + "\n");
                         }
@@ -75,7 +77,9 @@ public class ModelGenerator {
 
                             // istanzio la nuova operazione e la aggiungo alla lista delle operazioni possibili nel sistema
                             Operation o = new Operation( OperationId, OperationName, OperationDescription);
-                            OperationList.add(o);
+
+                            if(!OperationList.contains(o))
+                                OperationList.add(o);
 
                             System.out.println(" new OPERATION: " + "\n        id = " + o.getOperationId() + "\n        name = " + o.getName() + "\n        description = " + o.getDescription() + "\n");
                         }
@@ -141,7 +145,8 @@ public class ModelGenerator {
                                     r = new Role(RoleId, RoleName, PermissionList);
 
                                     // aggiungo r alla lista dei ruoli
-                                    RoleList.add(r);
+                                    if(!RoleList.contains(r))
+                                        RoleList.add(r);
 
                                     outPermission.append("        permission added to the role: " + "\n                   permission_id = ").append(p.getId()).append("\n                   object_id = ").append(p.getRBACObject().getObjectId()).append("\n                   operation_id = ").append(p.getOperation().getOperationId()).append("\n");
                                 }
@@ -181,9 +186,13 @@ public class ModelGenerator {
                                     // aggiungo alla lista dei ruoli dell'utente il ruolo il cui id è scritto nell'xml
                                     for (Role r: RoleList) {
                                         if(RoleId == r.getRoleId()) {
-                                            UserRoleList.add(r);
 
-                                            outUser.append("        authorized role added to the user: " + "\n                   role_id = ").append(r.getRoleId()).append("\n                   role_name = ").append(r.getRoleName()).append("\n");
+                                            if (!UserRoleList.contains(r)) {
+                                                UserRoleList.add(r);
+
+                                                outUser.append("        authorized role added to the user: " + "\n                   role_id = ").append(r.getRoleId()).append("\n                   role_name = ").append(r.getRoleName()).append("\n");
+
+                                            }
                                         }
                                     }
                                 }
