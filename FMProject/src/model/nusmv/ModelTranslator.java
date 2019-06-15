@@ -24,7 +24,7 @@ public class ModelTranslator {
         // session = ModelGenerator.createSession();
 
         // Inizializzo le liste di oggetti che rappresentano la sessione
-        initializeLists(users, roles, objects, permissions, operations);
+        initializeLists(roles, objects, permissions, operations);
 
         String nusmvCode = "";
 
@@ -101,7 +101,7 @@ public class ModelTranslator {
         return nusmvCode;
     }
 
-    private static void initializeLists(ArrayList<User> users, ArrayList<Role> roles, ArrayList<RBACObject> objects, ArrayList<Permission> permissions, ArrayList<Operation> operations) {
+    private static void initializeLists(ArrayList<Role> roles, ArrayList<RBACObject> objects, ArrayList<Permission> permissions, ArrayList<Operation> operations) {
         users = session.getUsers();
 
         for(User user : users){
