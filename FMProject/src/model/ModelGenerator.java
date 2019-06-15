@@ -13,8 +13,12 @@ import java.util.ArrayList;
 
 public class ModelGenerator {
 
+    private static ArrayList<Role> RoleList = new ArrayList<Role>();
+    private static ArrayList<RBACObject> RBACObjectList = new ArrayList<RBACObject>();
+    private static ArrayList<Operation> OperationList = new ArrayList<Operation>();
 
-    public static void parseStream(Node node, int level, String type, String output, ArrayList<Role> RoleList) throws Exception {
+
+    public static void parseStream(Node node, int level, String type, String output) throws Exception {
 
         //-----------------------------------------------------------------------------------------------------------------------------------------
         // Spaziatura ad albero per i livelli
@@ -50,7 +54,7 @@ public class ModelGenerator {
                         //-----------------------------------------------------------------------------------------------------------------------------------------
                         // NEW OBJECT
                         // Se sto scorrendo la lista degli oggetti e devo aggiungere al sistema l'elemento attuale come oggetto
-                        if(type.equals("objects") && element.getNodeName().equals("object")){
+                        if(type.equals("objects") && element.getNodeName().equals("RBACObject")){
 
                             // mi ricavo l'id dell'oggetto
                             int ObjectId = Integer.parseInt(element.getAttributes().item(0).getTextContent());
@@ -58,8 +62,10 @@ public class ModelGenerator {
                             // mi ricavo il nome dell'oggetto
                             String ObjectName = element.getChildNodes().item(1).getTextContent();
 
-                            // istanzio il nuovo oggetto
+                            // istanzio il nuovo oggetto e lo aggiungo alla lista degli oggetti
                             RBACObject o = new RBACObject( ObjectId, ObjectName);
+                            RBACObjectList.add(o);
+
                             System.out.print("      ****oggetto creato: " + " id = " + o.getObjectId() + "    nome = " + o.getObjectName() + "***");
                         }
                         //-----------------------------------------------------------------------------------------------------------------------------------------
@@ -76,8 +82,10 @@ public class ModelGenerator {
                             // mi ricavo il tipo dell'operazione
                             String OperationDescription = element.getChildNodes().item(3).getTextContent();
 
-                            // istanzio il nuovo oggetto
+                            // istanzio la nuova operazione e la aggiungo alla lista delle operazioni possibili nel sistema
                             Operation o = new Operation( OperationId, OperationName, OperationDescription);
+                            OperationList.add(o);
+
                             System.out.print("      ****operazione creata: " + " id = " + o.getOperationId() + "    nome = " + o.getName() + "    descrizione = " + o.getDescription() + "***");
                         }
                         //-----------------------------------------------------------------------------------------------------------------------------------------
@@ -89,14 +97,30 @@ public class ModelGenerator {
                             int PermissionId = Integer.parseInt(element.getAttributes().item(0).getTextContent());
 
                             // mi ricavo l'id dell'oggetto associato al permesso
-                            int ObjectId = Integer.parseInt(element.getChildNodes().item(1).getTextContent());
+                            int RBACObjectId = Integer.parseInt(element.getChildNodes().item(1).getTextContent());
 
                             // mi ricavo l'id dell'operazione associata al permesso
                             int OperationId = Integer.parseInt(element.getChildNodes().item(3).getTextContent());
 
+                            // inizializzo l'oggetto di cui mi ricaverò il nome dalla lista statica
+                            RBACObject RBACo = new RBACObject(RBACObjectId,"");
+
+                            for (RBACObject obj: RBACObjectList) {
+                                if(obj.getObjectId() == RBACObjectId)
+                                    RBACo = obj;
+                            }
+
+                            // inizializzo il permesso di cui mi ricaverò il nome e la descrizione dalla lista statica
+                            Operation operationP = new Operation(OperationId,"", "");
+
+                            for (Operation op: OperationList) {
+                                if(op.getOperationId() == OperationId)
+                                    operationP = op;
+                            }
+
                             // istanzio il nuovo oggetto permesso
-                            Permission p = new Permission( PermissionId, ObjectId, OperationId);
-                            System.out.print("      ****permesso creato: " + " id = " + p.getId() + "    id_oggetto = " + p.getRBACObject() + "    id_operazione = " + p.getOperation() + "***");
+                            Permission p = new Permission( PermissionId, RBACo, operationP);
+                            System.out.print("      ****permesso creato: " + " id = " + p.getId() + "    id_oggetto = " + p.getRBACObject().getObjectId() + "    id_operazione = " + p.getOperation().getOperationId() + "***");
                         }
                         //-----------------------------------------------------------------------------------------------------------------------------------------
                         // NEW ROLE
@@ -127,13 +151,30 @@ public class ModelGenerator {
                                     int PermissionId = Integer.parseInt(permissions.getChildNodes().item(k).getAttributes().item(0).getTextContent());
 
                                     // mi ricavo l'id dell'oggetto associato al permesso
-                                    int ObjectId = Integer.parseInt(permissions.getChildNodes().item(k).getChildNodes().item(1).getTextContent());
+                                    int RBACObjectId = Integer.parseInt(permissions.getChildNodes().item(k).getChildNodes().item(1).getTextContent());
 
                                     // mi ricavo l'id dell'operazione associata al permesso
                                     int OperationId = Integer.parseInt(permissions.getChildNodes().item(k).getChildNodes().item(3).getTextContent());
 
+                                    // inizializzo l'oggetto di cui mi ricaverò il nome dalla lista statica
+                                    RBACObject RBACo = new RBACObject(RBACObjectId,"");
+
+                                    for (RBACObject obj: RBACObjectList) {
+                                        if(obj.getObjectId() == RBACObjectId)
+                                            RBACo = obj;
+                                    }
+
+                                    // inizializzo il permesso di cui mi ricaverò il nome e la descrizione dalla lista statica
+                                    Operation operationP = new Operation(OperationId,"", "");
+
+                                    for (Operation op: OperationList) {
+                                        if(op.getOperationId() == OperationId)
+                                            operationP = op;
+                                    }
+
+
                                     // creo e aggiungo il nuovo permesso alla lista dei permessi del ruolo considerato
-                                    Permission p = new Permission(PermissionId, ObjectId, OperationId);
+                                    Permission p = new Permission(PermissionId, RBACo, operationP);
                                     PermissionList.add(p);
 
                                     // aggiorno il ruolo r con la lista dei permessi associati
@@ -142,7 +183,7 @@ public class ModelGenerator {
                                     // aggiungo r alla lista dei ruoli
                                     RoleList.add(r);
 
-                                    System.out.print("      ****permesso aggiunto al ruolo: " + " id_permesso = " + p.getId() + "    id_oggetto = " + p.getRBACObject() + "    id_operazione = " + p.getOperation() + "***");
+                                    System.out.print("      ****permesso aggiunto al ruolo: " + " id_permesso = " + p.getId() + "    id_oggetto = " + p.getRBACObject().getObjectId() + "    id_operazione = " + p.getOperation().getOperationId() + "***");
 
                                 }
                             }
@@ -215,14 +256,12 @@ public class ModelGenerator {
 
                             // Si scende nell'albero se si ha almeno un figlio non testuale
                         else if (element.getChildNodes().getLength() > 0)
-                            parseStream(element, level + 1, type, output, RoleList);
+                            parseStream(element, level + 1, type, output);
                     }
                 }
             }
         }
     }
-
-
 
     public static void main(String[] args) throws Exception {
         // Costruiamo una factory per processare il nostro flusso di dati
@@ -242,7 +281,7 @@ public class ModelGenerator {
         String type = "session";
 
         //Si parte con la ricorsione dalla radice
-        parseStream(root, 0, type, "", new ArrayList<Role>());
+        parseStream(root, 0, type, "");
     }
 
     /*
