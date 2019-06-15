@@ -246,7 +246,7 @@ public class ModelGenerator {
         System.out.println("\n--------------------------------------------------------------------------------------------------------------\n new SESSION" +
                 "\n--------------------------------------------------------------------------------------------------------------\n");
 
-        //Si parte con la ricorsione dalla radice
+        //Si parte con la ricorsione dalla radice session
         parseStream(root, 0, "session");
     }
 
