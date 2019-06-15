@@ -1,6 +1,6 @@
 package src.model.nusmv;
 
-import src.model.ModelGenerator;
+//import src.model.ModelGenerator;
 import src.model.elements.*;
 
 import java.util.ArrayList;
@@ -53,13 +53,14 @@ public class ModelTranslator {
             userActiveOpDomain = userActiveOpDomain.concat("}");
             userActiveOpDomain = userActiveOpDomain.replace(",}", "}");
 
-            String var = tabSpace + tabSpace + "user" + idStr + " : user(" + idStr + ", " + userActiveOpDomain + ");\n";
+            String var = tabSpace + tabSpace + "user" + idStr + " : user(" + idStr + ", " + userActiveOpDomain + ");" +
+                    " -- user " + user.getUserName() + "\n";
             mainModule = mainModule.concat(var);
         }
 
         for(Role role : roles){
             String idStr = String.valueOf(role.getRoleId());
-            String var = tabSpace + tabSpace + "role" + idStr + " : role(" + idStr + ");\n";
+            String var = tabSpace + tabSpace + "role" + idStr + " : role(" + idStr + "); -- role " + role.getRoleName() + "\n";
             mainModule = mainModule.concat(var);
         }
 
@@ -70,7 +71,8 @@ public class ModelTranslator {
                 String activeStr = String.valueOf(user.getActiveRole().getRoleId() == role.getRoleId());
 
                 String var = tabSpace + tabSpace + "userRole" + userIdStr + roleIdStr + " : userRole(" +
-                        userIdStr + ", " + roleIdStr + ", " + activeStr + ");\n";
+                        userIdStr + ", " + roleIdStr + ", " + activeStr + "); " +
+                        "-- (" + user.getUserName() + ", " + role.getRoleName() + ")\n";
                 mainModule = mainModule.concat(var);
 
             }
@@ -82,22 +84,28 @@ public class ModelTranslator {
             String objId = String.valueOf(permission.getRBACObject().getObjectId());
 
             String var = tabSpace + tabSpace +
-                    "permission" + idStr + " : permission(" + idStr + ", " + opId + ", " + objId + ");\n";
+                    "permission" + idStr + " : permission(" + idStr + ", " + opId + ", " + objId + ");" +
+                    " -- Permesso di eseguire " + permission.getOperation().getName() + " su " +
+                    permission.getRBACObject().getObjectName() + "\n";
             mainModule = mainModule.concat(var);
         }
 
         for(RBACObject object : objects){
             String idStr = String.valueOf(object.getObjectId());
-            String var = tabSpace + tabSpace + "object" + idStr + " : " + "object(" + idStr + ");\n";
+            String var = tabSpace + tabSpace + "object" + idStr + " : " + "object(" + idStr + "); " +
+                    "-- " + object.getObjectName() + "\n";
             mainModule = mainModule.concat(var);
         }
 
         for(Operation operation : operations){
             String idStr = String.valueOf(operation.getOperationId());
-            String var = tabSpace + tabSpace + "operation" + idStr + " : " + "operation(" + idStr + ");\n";
+            String var = tabSpace + tabSpace + "operation" + idStr + " : " + "operation(" + idStr + "); " +
+                    "-- Operazione " + operation.getName() + "\n";
             mainModule = mainModule.concat(var);
         }
 
+
+        nusmvCode = nusmvCode.concat(mainModule);
         return nusmvCode;
     }
 
@@ -237,4 +245,48 @@ public class ModelTranslator {
                 new String[]{"id"},
                 new String[]{"id"});
     }
+
+
+    public static void main(String[] args){
+        RBACObject cartelle = new RBACObject(0, "cartelle");
+        RBACObject dati_pazienti = new RBACObject(1, "dati pazienti");
+        RBACObject stipendi = new RBACObject(2, "stipendi");
+
+        Operation scriviCartelle = new Operation(0, "scrivi", "modifiche cartelle");
+        Operation scriviDati = new Operation(1, "scrivi", "modifiche dati pazienti");
+        Operation leggiDati = new Operation(2, "leggi", "leggi dati paziente");
+
+        Permission permessoScritturaCartelle = new Permission(0, cartelle, scriviCartelle);
+        Permission permessoScritturaDati = new Permission(1, dati_pazienti, scriviDati);
+        Permission permessoLetturaDati = new Permission(2, dati_pazienti, leggiDati);
+
+        ArrayList<Permission> permessiAmministrazione = new ArrayList<>();
+        permessiAmministrazione.add(permessoScritturaCartelle);
+
+        ArrayList<Permission> permessiMedico = new ArrayList<>();
+        permessiMedico.add(permessoScritturaDati);
+        permessiMedico.add(permessoLetturaDati);
+
+        Role amministrazione = new Role(0, "amministrazione", permessiAmministrazione);
+        Role medico = new Role(1, "medico", permessiMedico);
+
+        ArrayList<Role> rolesUser1 = new ArrayList<>();
+        rolesUser1.add(amministrazione);
+
+        ArrayList<Role> rolesUser2 = new ArrayList<>();
+        rolesUser2.add(medico);
+
+        User user1 = new User(0, "mario", rolesUser1, amministrazione, scriviCartelle);
+        User user2 = new User(1, "alice", rolesUser2, medico, leggiDati);
+
+        ArrayList<User> users = new ArrayList<>();
+        users.add(user1);
+        users.add(user2);
+
+        session = new Session(users);
+
+        String code = fromModelToNuSMV("");
+        System.out.println(code);
+    }
+
 }
