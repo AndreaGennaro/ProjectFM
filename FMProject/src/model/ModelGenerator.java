@@ -42,7 +42,7 @@ public class ModelGenerator {
                             type = element.getNodeName();
                         }
 
-                        //-----------------------------------------------------------------------------------------------------------------------------------------
+                        //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
                         // NEW OBJECT
                         // Se sto scorrendo la lista degli oggetti e devo aggiungere al sistema l'elemento attuale come oggetto
                         if(type.equals("objects") && element.getNodeName().equals("RBACObject")){
@@ -61,7 +61,7 @@ public class ModelGenerator {
                             */
                             System.out.println(" new OBJECT: " + "\n        id = " + o.getObjectId() + "\n        name = " + o.getObjectName() + "\n");
                         }
-                        //-----------------------------------------------------------------------------------------------------------------------------------------
+                        //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
                         // NEW OPERATION
                         // Se sto scorrendo la lista delle operazioni e devo aggiungere al sistema l'elemento attuale come operazione
                         else if(type.equals("operations") && element.getNodeName().equals("operation")){
@@ -83,7 +83,7 @@ public class ModelGenerator {
                             */
                             System.out.println(" new OPERATION: " + "\n        id = " + o.getOperationId() + "\n        name = " + o.getName() + "\n        description = " + o.getDescription() + "\n");
                         }
-                        //-----------------------------------------------------------------------------------------------------------------------------------------
+                        //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
                         // NEW PERMISSION
                         // Se sto scorrendo la lista dei permessi e devo aggiungere al sistema l'elemento attuale come permesso
                         else if(type.equals("permissions") && element.getNodeName().equals("permission")){
@@ -102,7 +102,7 @@ public class ModelGenerator {
 
                             System.out.println(" new PERMISSION: " + "\n        id = " + p.getId() + "\n        object_id = " + p.getRBACObject().getObjectId() + "\n        operation_id = " + p.getOperation().getOperationId() + "\n");
                         }
-                        //-----------------------------------------------------------------------------------------------------------------------------------------
+                        //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
                         // NEW ROLE
                         // Se sto scorrendo la lista dei ruoli e devo aggiungere al sistema l'elemento attuale come ruolo
                         else if(type.equals("roles") && element.getNodeName().equals("role")) {
@@ -148,15 +148,15 @@ public class ModelGenerator {
                                     // aggiungo il ruolo r alla lista dei ruoli
                                     RoleList.add(r);
 
-                                    outPermission.append("        permission added to the role: " + "\n                   permission_id = ").append(p.getId()).append("\n                   object_id = ").append(p.getRBACObject().getObjectId()).append("\n                   operation_id = ").append(p.getOperation().getOperationId()).append("\n");
+                                    outPermission.append("        permission added to the role: " + "\n                   permission_id = ").append(p.getId()).append("\n         " +
+                                            "          object_id = ").append(p.getRBACObject().getObjectId()).append("\n                   operation_id = ").append(p.getOperation().getOperationId()).append("\n");
                                 }
                             }
 
                             System.out.println(" new ROLE: " + "\n        id = " + r.getRoleId() + "\n        name = " + r.getRoleName() + "\n" + outPermission);
 
                         }
-
-                        //-----------------------------------------------------------------------------------------------------------------------------------------
+                        //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
                         // NEW USER
                         // Se sto scorrendo la lista degli utenti e devo aggiungere al sistema l'elemento attuale come nuovo utente
                         if(type.equals("users") && element.getNodeName().equals("user")) {
@@ -206,7 +206,7 @@ public class ModelGenerator {
 
                             System.out.println(" new USER: " + "\n        id = " + UserId + "\n        name = " + UserName + "\n" + outUser);
                         }
-
+                        //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
                         // Si scende nell'albero se si ha almeno un figlio non testuale
                         if (element.getChildNodes().getLength() > 0)
                             parseStream(element, level + 1, type);
