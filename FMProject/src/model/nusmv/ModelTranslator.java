@@ -33,6 +33,7 @@ public class ModelTranslator {
         nusmvCode = nusmvCode.concat(generateRoleModule());
         nusmvCode = nusmvCode.concat(generateUserRoleModule());
         nusmvCode = nusmvCode.concat(generatePermissionModule());
+        nusmvCode = nusmvCode.concat(generateRolePermissionModule());
         nusmvCode = nusmvCode.concat(generateOperationModule());
         nusmvCode = nusmvCode.concat(generateObjectModule());
 
@@ -69,8 +70,8 @@ public class ModelTranslator {
 
         // Writes user-roles intantiations
         for(User user : users){
+            String userIdStr = String.valueOf(user.getUserId());
             for(Role role : user.getAuthRoles()){
-                String userIdStr = String.valueOf(user.getUserId());
                 String roleIdStr = String.valueOf(role.getRoleId());
                 String activeStr = String.valueOf(user.getActiveRole().getRoleId() == role.getRoleId());
 
@@ -92,6 +93,17 @@ public class ModelTranslator {
                     " -- Permesso di eseguire " + permission.getOperation().getName() + " su " +
                     permission.getRBACObject().getObjectName() + "\n";
             mainModule = mainModule.concat(var);
+        }
+
+        for(Role role : roles){
+            String roleIdStr = String.valueOf(role.getRoleId());
+            for(Permission permission : role.getPermissionList()){
+                String permIdStr = String.valueOf(permission.getId());
+
+                String var = tabSpace + tabSpace + "rp" + roleIdStr + "_" + permIdStr + " : rolePermission(" +
+                        roleIdStr + ", " + permIdStr + ");\n";
+                mainModule = mainModule.concat(var);
+            }
         }
 
         for(RBACObject object : objects){
@@ -205,7 +217,7 @@ public class ModelTranslator {
      */
     private static String generateUserRoleModule(){
         return generateModule("userRole",
-                new String[]{"user", "role", "active", "status"}, // ids
+                new String[]{"user", "role", "active", "status"}, // variables
                 new String[]{"0..100", "0..100", "boolean", "{Aut, NoAut}"}, // domains
                 new String[]{"user", "role", "active", "Aut"}, //init
                 new String[]{"user", "role", "active", "{Aut, NoAut}"}); //next
@@ -220,8 +232,18 @@ public class ModelTranslator {
                 "permission",
                 new String[]{"permid", "operid", "objectid"},
                 new String[]{"0..100", "0..100", "0..100"},
-                new String[]{"id", "id", "id"},
-                new String[]{"id", "id", "id"});
+                new String[]{"permid", "operid", "objectid"},
+                new String[]{"permid", "operid", "objectid"});
+    }
+
+    private static String generateRolePermissionModule(){
+        return generateModule(
+                "rolePermission",
+                new String[]{"roleId", "permId"},
+                new String[]{"0..100", "0..100"},
+                new String[]{"roleId", "permId"},
+                new String[]{"roleId", "permId"}
+        );
     }
 
     /**
