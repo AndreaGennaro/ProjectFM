@@ -45,18 +45,18 @@ public class ModelTranslator {
         // Writes all users instantiations
         for(User user : users){
             String idStr = String.valueOf(user.getUserId());
-            String userActiveOpDomain = "{";
+            String userActivePermDomain = "{";
 
             for(Role role : user.getAuthRoles()){
                 for(Permission permission : role.getPermissionList()){
                     String opId = String.valueOf(permission.getId());
-                    userActiveOpDomain = userActiveOpDomain.concat(opId + ",");
+                    userActivePermDomain = userActivePermDomain.concat(opId + ",");
                 }
             }
-            userActiveOpDomain = userActiveOpDomain.concat("}");
-            userActiveOpDomain = userActiveOpDomain.replace(",}", "}");
+            userActivePermDomain = userActivePermDomain.concat("}");
+            userActivePermDomain = userActivePermDomain.replace(",}", "}");
 
-            String var = tabSpace + tabSpace + "user" + idStr + " : user(" + idStr + ", " + userActiveOpDomain + ");" +
+            String var = tabSpace + tabSpace + "user" + idStr + " : user(" + idStr + ", " + userActivePermDomain + ");" +
                     " -- user " + user.getUserName() + "\n";
             mainModule = mainModule.concat(var);
         }
@@ -192,10 +192,10 @@ public class ModelTranslator {
      */
     private static String generateUserModule(){
         return generateModule("user",
-                new String[]{"id", "activeOp"},
+                new String[]{"id", "activePerm"},
                 new String[]{"0..100", "0.." + operations.size()},
-                new String[]{"id", "activeOp"},
-                new String[]{"id", "activeOp"});
+                new String[]{"id", "activePerm"},
+                new String[]{"id", "activePerm"});
     }
 
     /**
