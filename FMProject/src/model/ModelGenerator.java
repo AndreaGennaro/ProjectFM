@@ -55,10 +55,10 @@ public class ModelGenerator {
 
                             // istanzio il nuovo oggetto e lo aggiungo alla lista degli oggetti
                             RBACObject o = new RBACObject( ObjectId, ObjectName);
-
+                            /*
                             if(!RBACObjectList.contains(o))
                                 RBACObjectList.add(o);
-
+                            */
                             System.out.println(" new OBJECT: " + "\n        id = " + o.getObjectId() + "\n        name = " + o.getObjectName() + "\n");
                         }
                         //-----------------------------------------------------------------------------------------------------------------------------------------
@@ -77,10 +77,10 @@ public class ModelGenerator {
 
                             // istanzio la nuova operazione e la aggiungo alla lista delle operazioni possibili nel sistema
                             Operation o = new Operation( OperationId, OperationName, OperationDescription);
-
+                            /*
                             if(!OperationList.contains(o))
                                 OperationList.add(o);
-
+                            */
                             System.out.println(" new OPERATION: " + "\n        id = " + o.getOperationId() + "\n        name = " + o.getName() + "\n        description = " + o.getDescription() + "\n");
                         }
                         //-----------------------------------------------------------------------------------------------------------------------------------------
@@ -142,11 +142,11 @@ public class ModelGenerator {
                                     Permission p = createPermission(RBACObjectId,OperationId,PermissionId);
 
                                     // aggiorno il ruolo r con la lista dei permessi associati
-                                    r = new Role(RoleId, RoleName, PermissionList);
+                                    PermissionList.add(p);
+                                    r.setPermissionList(PermissionList);
 
-                                    // aggiungo r alla lista dei ruoli
-                                    if(!RoleList.contains(r))
-                                        RoleList.add(r);
+                                    // aggiungo il ruolo r alla lista dei ruoli
+                                    RoleList.add(r);
 
                                     outPermission.append("        permission added to the role: " + "\n                   permission_id = ").append(p.getId()).append("\n                   object_id = ").append(p.getRBACObject().getObjectId()).append("\n                   operation_id = ").append(p.getOperation().getOperationId()).append("\n");
                                 }
@@ -188,8 +188,8 @@ public class ModelGenerator {
                                         if(RoleId == r.getRoleId()) {
 
                                             if (!UserRoleList.contains(r)) {
-                                                UserRoleList.add(r);
 
+                                                UserRoleList.add(r);
                                                 outUser.append("        authorized role added to the user: " + "\n                   role_id = ").append(r.getRoleId()).append("\n                   role_name = ").append(r.getRoleName()).append("\n");
 
                                             }
