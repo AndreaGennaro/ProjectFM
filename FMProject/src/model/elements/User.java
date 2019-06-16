@@ -8,14 +8,14 @@ public class User {
     private String userName;
     private ArrayList<Role> authRoles;
     private Role activeRole;
-    private Operation activeOp;
+    private Permission activePerm;
 
-    public User(int userId, String userName, ArrayList<Role> authRoles, Role activeRole, Operation activeOp) {
+    public User(int userId, String userName, ArrayList<Role> authRoles, Role activeRole, Permission activePerm) {
         this.userId = userId;
         this.userName = userName;
         this.authRoles = authRoles;
         this.activeRole = activeRole;
-        this.activeOp = activeOp;
+        this.activePerm = activePerm;
     }
 
     public int getUserId() {
@@ -50,11 +50,11 @@ public class User {
         this.activeRole = activeRole;
     }
 
-    public Operation getActiveOp() {
-        return activeOp;
+    public Permission getActivePerm() {
+        return activePerm;
     }
 
-    public void setActiveOp(Operation activeOp) {
-        this.activeOp = activeOp;
+    public void setActivePerm(Permission activePerm) {
+        this.activePerm = activePerm;
     }
 }
