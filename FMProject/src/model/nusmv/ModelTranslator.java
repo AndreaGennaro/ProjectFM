@@ -40,6 +40,8 @@ public class ModelTranslator {
         String mainModule = "MODULE main\n";
         mainModule = mainModule + tabSpace + "VAR\n";
 
+
+        // Writes all users instantiations
         for(User user : users){
             String idStr = String.valueOf(user.getUserId());
             String userActiveOpDomain = "{";
@@ -58,19 +60,21 @@ public class ModelTranslator {
             mainModule = mainModule.concat(var);
         }
 
+        // Writes roles instantiations
         for(Role role : roles){
             String idStr = String.valueOf(role.getRoleId());
             String var = tabSpace + tabSpace + "role" + idStr + " : role(" + idStr + "); -- role " + role.getRoleName() + "\n";
             mainModule = mainModule.concat(var);
         }
 
+        // Writes user-roles intantiations
         for(User user : users){
             for(Role role : user.getAuthRoles()){
                 String userIdStr = String.valueOf(user.getUserId());
                 String roleIdStr = String.valueOf(role.getRoleId());
                 String activeStr = String.valueOf(user.getActiveRole().getRoleId() == role.getRoleId());
 
-                String var = tabSpace + tabSpace + "userRole" + userIdStr + roleIdStr + " : userRole(" +
+                String var = tabSpace + tabSpace + "ur" + userIdStr + "_" + roleIdStr + " : userRole(" +
                         userIdStr + ", " + roleIdStr + ", " + activeStr + "); " +
                         "-- (" + user.getUserName() + ", " + role.getRoleName() + ")\n";
                 mainModule = mainModule.concat(var);
@@ -201,10 +205,10 @@ public class ModelTranslator {
      */
     private static String generateUserRoleModule(){
         return generateModule("userRole",
-                new String[]{"user", "role", "active"},
-                new String[]{"0..100", "0..100", "boolean"},
-                new String[]{"user", "role", "active"},
-                new String[]{"user", "role", "active"});
+                new String[]{"user", "role", "active", "status"}, // ids
+                new String[]{"0..100", "0..100", "boolean", "{Aut, NoAut}"}, // domains
+                new String[]{"user", "role", "active", "Aut"}, //init
+                new String[]{"user", "role", "active", "{Aut, NoAut}"}); //next
     }
 
     /**
