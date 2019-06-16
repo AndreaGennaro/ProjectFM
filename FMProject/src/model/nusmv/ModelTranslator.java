@@ -49,8 +49,8 @@ public class ModelTranslator {
 
             for(Role role : user.getAuthRoles()){
                 for(Permission permission : role.getPermissionList()){
-                    String opId = String.valueOf(permission.getId());
-                    userActivePermDomain = userActivePermDomain.concat(opId + ",");
+                    String permId = String.valueOf(permission.getId());
+                    userActivePermDomain = userActivePermDomain.concat(permId + ",");
                 }
             }
             userActivePermDomain = userActivePermDomain.concat("}");
