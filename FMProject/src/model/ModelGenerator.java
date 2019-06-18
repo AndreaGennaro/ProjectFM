@@ -202,7 +202,7 @@ public class ModelGenerator {
                             //DA FINIRE POI CON LOROOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
                             // ruolo attivo e operazione a cavolo!!!
 
-                            new User(UserId, UserName, UserRoleList, UserRoleList.get(0),new Operation(1,"",""));
+                            new User(UserId, UserName, UserRoleList, UserRoleList.get(0), UserRoleList.get(0).getPermissionList().get(0) );
 
                             System.out.println(" new USER: " + "\n        id = " + UserId + "\n        name = " + UserName + "\n" + outUser);
                         }
