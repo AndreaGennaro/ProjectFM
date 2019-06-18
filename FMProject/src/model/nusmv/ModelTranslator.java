@@ -93,7 +93,7 @@ public class ModelTranslator {
 
                 String var = tabSpace + tabSpace +
                         "permission" + idStr + " : permission(" + idStr + ", " + opId + ", " + objId + ");" +
-                        " -- Permesso di eseguire " + permission.getOperation().getName() + " su " +
+                        " -- Permesso di " + permission.getOperation().getName() + " su " +
                         permission.getRBACObject().getObjectName() + "\n";
                 mainModule = mainModule.concat(var);
             }
