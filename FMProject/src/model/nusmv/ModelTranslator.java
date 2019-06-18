@@ -1,6 +1,7 @@
 package src.model.nusmv;
 
 //import src.model.ModelGenerator;
+import src.model.ModelGenerator;
 import src.model.elements.*;
 
 import java.util.ArrayList;
@@ -21,109 +22,115 @@ public class ModelTranslator {
      * @return the NuSMV code as a string.
      */
     public static String fromModelToNuSMV(String sessionFilepath){
-        // session = ModelGenerator.createSession();
-
-        // Inizializzo le liste di oggetti che rappresentano la sessione
-        initializeLists();
-
-        String nusmvCode = "";
-
-        // Scrivo tutti i moduli
-        nusmvCode = nusmvCode.concat(generateUserModule());
-        nusmvCode = nusmvCode.concat(generateRoleModule());
-        nusmvCode = nusmvCode.concat(generateUserRoleModule());
-        nusmvCode = nusmvCode.concat(generatePermissionModule());
-        nusmvCode = nusmvCode.concat(generateRolePermissionModule());
-        nusmvCode = nusmvCode.concat(generateOperationModule());
-        nusmvCode = nusmvCode.concat(generateObjectModule());
-
-        //Scrivo il modulo main
-        String mainModule = "MODULE main\n";
-        mainModule = mainModule + tabSpace + "VAR\n";
+        try {
+            session = ModelGenerator.createSession(sessionFilepath);
 
 
-        // Writes all users instantiations
-        for(User user : users){
-            String idStr = String.valueOf(user.getUserId());
-            String userActivePermDomain = "{";
+            // Inizializzo le liste di oggetti che rappresentano la sessione
+            initializeLists();
 
-            for(Role role : user.getAuthRoles()){
-                for(Permission permission : role.getPermissionList()){
-                    String permId = String.valueOf(permission.getId());
-                    userActivePermDomain = userActivePermDomain.concat(permId + ",");
+            String nusmvCode = "";
+
+            // Scrivo tutti i moduli
+            nusmvCode = nusmvCode.concat(generateUserModule());
+            nusmvCode = nusmvCode.concat(generateRoleModule());
+            nusmvCode = nusmvCode.concat(generateUserRoleModule());
+            nusmvCode = nusmvCode.concat(generatePermissionModule());
+            nusmvCode = nusmvCode.concat(generateRolePermissionModule());
+            nusmvCode = nusmvCode.concat(generateOperationModule());
+            nusmvCode = nusmvCode.concat(generateObjectModule());
+
+            //Scrivo il modulo main
+            String mainModule = "MODULE main\n";
+            mainModule = mainModule + tabSpace + "VAR\n";
+
+
+            // Writes all users instantiations
+            for (User user : users) {
+                String idStr = String.valueOf(user.getUserId());
+                String userActivePermDomain = "{";
+
+                for (Role role : user.getAuthRoles()) {
+                    for (Permission permission : role.getPermissionList()) {
+                        String permId = String.valueOf(permission.getId());
+                        userActivePermDomain = userActivePermDomain.concat(permId + ",");
+                    }
+                }
+                userActivePermDomain = userActivePermDomain.concat("}");
+                userActivePermDomain = userActivePermDomain.replace(",}", "}");
+
+                String var = tabSpace + tabSpace + "user" + idStr + " : user(" + idStr + ", " + userActivePermDomain + ");" +
+                        " -- user " + user.getUserName() + "\n";
+                mainModule = mainModule.concat(var);
+            }
+
+            // Writes roles instantiations
+            for (Role role : roles) {
+                String idStr = String.valueOf(role.getRoleId());
+                String var = tabSpace + tabSpace + "role" + idStr + " : role(" + idStr + "); -- role " + role.getRoleName() + "\n";
+                mainModule = mainModule.concat(var);
+            }
+
+            // Writes user-roles intantiations
+            for (User user : users) {
+                String userIdStr = String.valueOf(user.getUserId());
+                for (Role role : user.getAuthRoles()) {
+                    String roleIdStr = String.valueOf(role.getRoleId());
+                    String activeStr = String.valueOf(user.getActiveRole().getRoleId() == role.getRoleId());
+
+                    String var = tabSpace + tabSpace + "ur" + userIdStr + "_" + roleIdStr + " : userRole(" +
+                            userIdStr + ", " + roleIdStr + ", " + activeStr + "); " +
+                            "-- (" + user.getUserName() + ", " + role.getRoleName() + ")\n";
+                    mainModule = mainModule.concat(var);
+
                 }
             }
-            userActivePermDomain = userActivePermDomain.concat("}");
-            userActivePermDomain = userActivePermDomain.replace(",}", "}");
 
-            String var = tabSpace + tabSpace + "user" + idStr + " : user(" + idStr + ", " + userActivePermDomain + ");" +
-                    " -- user " + user.getUserName() + "\n";
-            mainModule = mainModule.concat(var);
-        }
+            for (Permission permission : permissions) {
+                String idStr = String.valueOf(permission.getId());
+                String opId = String.valueOf(permission.getOperation().getOperationId());
+                String objId = String.valueOf(permission.getRBACObject().getObjectId());
 
-        // Writes roles instantiations
-        for(Role role : roles){
-            String idStr = String.valueOf(role.getRoleId());
-            String var = tabSpace + tabSpace + "role" + idStr + " : role(" + idStr + "); -- role " + role.getRoleName() + "\n";
-            mainModule = mainModule.concat(var);
-        }
+                String var = tabSpace + tabSpace +
+                        "permission" + idStr + " : permission(" + idStr + ", " + opId + ", " + objId + ");" +
+                        " -- Permesso di eseguire " + permission.getOperation().getName() + " su " +
+                        permission.getRBACObject().getObjectName() + "\n";
+                mainModule = mainModule.concat(var);
+            }
 
-        // Writes user-roles intantiations
-        for(User user : users){
-            String userIdStr = String.valueOf(user.getUserId());
-            for(Role role : user.getAuthRoles()){
+            for (Role role : roles) {
                 String roleIdStr = String.valueOf(role.getRoleId());
-                String activeStr = String.valueOf(user.getActiveRole().getRoleId() == role.getRoleId());
+                for (Permission permission : role.getPermissionList()) {
+                    String permIdStr = String.valueOf(permission.getId());
 
-                String var = tabSpace + tabSpace + "ur" + userIdStr + "_" + roleIdStr + " : userRole(" +
-                        userIdStr + ", " + roleIdStr + ", " + activeStr + "); " +
-                        "-- (" + user.getUserName() + ", " + role.getRoleName() + ")\n";
-                mainModule = mainModule.concat(var);
-
+                    String var = tabSpace + tabSpace + "rp" + roleIdStr + "_" + permIdStr + " : rolePermission(" +
+                            roleIdStr + ", " + permIdStr + ");\n";
+                    mainModule = mainModule.concat(var);
+                }
             }
-        }
 
-        for(Permission permission : permissions){
-            String idStr = String.valueOf(permission.getId());
-            String opId = String.valueOf(permission.getOperation().getOperationId());
-            String objId = String.valueOf(permission.getRBACObject().getObjectId());
-
-            String var = tabSpace + tabSpace +
-                    "permission" + idStr + " : permission(" + idStr + ", " + opId + ", " + objId + ");" +
-                    " -- Permesso di eseguire " + permission.getOperation().getName() + " su " +
-                    permission.getRBACObject().getObjectName() + "\n";
-            mainModule = mainModule.concat(var);
-        }
-
-        for(Role role : roles){
-            String roleIdStr = String.valueOf(role.getRoleId());
-            for(Permission permission : role.getPermissionList()){
-                String permIdStr = String.valueOf(permission.getId());
-
-                String var = tabSpace + tabSpace + "rp" + roleIdStr + "_" + permIdStr + " : rolePermission(" +
-                        roleIdStr + ", " + permIdStr + ");\n";
+            for (RBACObject object : objects) {
+                String idStr = String.valueOf(object.getObjectId());
+                String var = tabSpace + tabSpace + "object" + idStr + " : " + "object(" + idStr + "); " +
+                        "-- " + object.getObjectName() + "\n";
                 mainModule = mainModule.concat(var);
             }
+
+            for (Operation operation : operations) {
+                String idStr = String.valueOf(operation.getOperationId());
+                String var = tabSpace + tabSpace + "operation" + idStr + " : " + "operation(" + idStr + "); " +
+                        "-- Operazione " + operation.getName() + "\n";
+                mainModule = mainModule.concat(var);
+            }
+
+
+            nusmvCode = nusmvCode.concat(mainModule);
+            nusmvCode = nusmvCode.concat(generateLTLFormula());
+            return nusmvCode;
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
-        for(RBACObject object : objects){
-            String idStr = String.valueOf(object.getObjectId());
-            String var = tabSpace + tabSpace + "object" + idStr + " : " + "object(" + idStr + "); " +
-                    "-- " + object.getObjectName() + "\n";
-            mainModule = mainModule.concat(var);
-        }
-
-        for(Operation operation : operations){
-            String idStr = String.valueOf(operation.getOperationId());
-            String var = tabSpace + tabSpace + "operation" + idStr + " : " + "operation(" + idStr + "); " +
-                    "-- Operazione " + operation.getName() + "\n";
-            mainModule = mainModule.concat(var);
-        }
-
-
-        nusmvCode = nusmvCode.concat(mainModule);
-        nusmvCode = nusmvCode.concat(generateLTLFormula());
-        return nusmvCode;
+        return null;
     }
 
     /**
