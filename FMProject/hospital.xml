@@ -39,15 +39,15 @@
         <role id="1">
             <name>Dottore</name>
             <permissions>
-                <permission>1</permission>
-                <permission>2</permission>
+                <permission id="1"/>
+                <permission id="2"/>
             </permissions>
         </role>
 
         <role id="2">
             <name>Amministrazione</name>
             <permissions>
-                <permission>2</permission>
+                <permission id="2"/>
             </permissions>
         </role>
 
