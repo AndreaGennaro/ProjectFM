@@ -21,6 +21,9 @@ public class ModelGenerator {
     // lista delle operazioni nel sistema
     private static ArrayList<Operation> OperationList = new ArrayList<>();
 
+    // lista degli utenti nel sistema
+    private static ArrayList<User> UserList = new ArrayList<>();
+
 
     private static void parseStream(Node node, int level, String type){
 
@@ -55,10 +58,10 @@ public class ModelGenerator {
 
                             // istanzio il nuovo oggetto e lo aggiungo alla lista degli oggetti
                             RBACObject o = new RBACObject( ObjectId, ObjectName);
-                            /*
+
                             if(!RBACObjectList.contains(o))
                                 RBACObjectList.add(o);
-                            */
+
                             System.out.println(" new OBJECT: " + "\n        id = " + o.getObjectId() + "\n        name = " + o.getObjectName() + "\n");
                         }
                         //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -77,10 +80,10 @@ public class ModelGenerator {
 
                             // istanzio la nuova operazione e la aggiungo alla lista delle operazioni possibili nel sistema
                             Operation o = new Operation( OperationId, OperationName, OperationDescription);
-                            /*
+
                             if(!OperationList.contains(o))
                                 OperationList.add(o);
-                            */
+
                             System.out.println(" new OPERATION: " + "\n        id = " + o.getOperationId() + "\n        name = " + o.getName() + "\n        description = " + o.getDescription() + "\n");
                         }
                         //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -198,11 +201,9 @@ public class ModelGenerator {
                                 }
                             }
 
-
                             //DA FINIRE POI CON LOROOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
                             // ruolo attivo e operazione a cavolo!!!
-
-                            new User(UserId, UserName, UserRoleList, UserRoleList.get(0), UserRoleList.get(0).getPermissionList().get(0) );
+                            UserList.add( new User(UserId, UserName, UserRoleList, UserRoleList.get(0), UserRoleList.get(0).getPermissionList().get(0)) );
 
                             System.out.println(" new USER: " + "\n        id = " + UserId + "\n        name = " + UserName + "\n" + outUser);
                         }
@@ -238,7 +239,15 @@ public class ModelGenerator {
         return new Permission( PermissionId, RBACo, operationP);
     }
 
+    // main per testing della classe
     public static void main(String[] args) throws Exception {
+        createSession("C:\\Users\\theje\\IdeaProjects\\ProjectFM\\FMProject\\base.xml");
+        System.out.println("##############################" + UserList.size());
+    }
+
+    // Metodo che richiama un lettore per file xml e crea una sessione con i dati estrapolati
+    public static Session createSession(String xmlFilePath) throws Exception{
+
         // Costruiamo una factory per processare il nostro flusso di dati
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 
@@ -246,7 +255,7 @@ public class ModelGenerator {
         DocumentBuilder builder = factory.newDocumentBuilder();
 
         // Carichiamo il nostro documento da un file (assicuratevi sia nel path giusto)
-        Document doc = builder.parse(new File("C:\\Users\\theje\\IdeaProjects\\ProjectFM\\FMProject\\base.xml"));
+        Document doc = builder.parse(new File(xmlFilePath));
 
         // Prendiamo il primo nodo - come suggerisce il metodo - la radice
         Node root = doc.getFirstChild();
@@ -254,14 +263,12 @@ public class ModelGenerator {
         System.out.println("\n--------------------------------------------------------------------------------------------------------------\n new SESSION" +
                 "\n--------------------------------------------------------------------------------------------------------------\n");
 
-        //Si parte con la ricorsione dalla radice session
+        // Si parte con la ricorsione dalla radice session
         parseStream(root, 0, "session");
+
+        // Creo il nuovo oggetto sessione con i dati dell'xml
+        return new Session(UserList, RoleList);
     }
-
-    /*
-    public Session createSession(String xmlFilePath){
-
-    }*/
 }
 
 
