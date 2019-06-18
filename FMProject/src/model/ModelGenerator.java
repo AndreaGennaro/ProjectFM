@@ -155,7 +155,7 @@ public class ModelGenerator {
                                     // aggiorno il ruolo r con la lista dei permessi associati
                                     r.setPermissionList(RolePermissionList);
 
-                                    // aggiungo il ruolo r alla lista dei ruoli
+                                    // aggiungo il ruolo r alla lista dei ruoli del sistema
                                     RoleList.add(r);
 
 
