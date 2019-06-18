@@ -1,0 +1,75 @@
+<session>
+
+    <objects>
+        <RBACObject id="1">
+            <name>SalaOperatoria</name>
+        </RBACObject>
+
+        <RBACObject id="2">
+            <name>DatiPazienti</name>
+        </RBACObject>
+    </objects>
+
+    <operations>
+        <operation id="1">
+            <name>Operare</name>
+            <description>Op description</description>
+        </operation>
+
+        <operation id="2">
+            <name>Visualizzare</name>
+            <description>Op description</description>
+        </operation>
+    </operations>
+
+    <permissions>
+        <permission id="1">
+            <RBACObject>1</RBACObject>
+            <operation>1</operation>
+        </permission>
+
+        <permission id="2">
+            <RBACObject>2</RBACObject>
+            <operation>2</operation>
+        </permission>
+    </permissions>
+
+    <roles>
+
+        <role id="1">
+            <name>Dottore</name>
+            <permissions>
+                <permission id="1">
+                    <RBACObject>1</RBACObject>
+                    <operation>1</operation>
+                </permission>
+                <permission id="2">
+                    <RBACObject>2</RBACObject>
+                    <operation>2</operation>
+                </permission>
+            </permissions>
+        </role>
+
+        <role id="2">
+            <name>Amministrazione</name>
+            <permissions>
+                <permission id="2">
+                    <RBACObject>2</RBACObject>
+                    <operation>2</operation>
+                </permission>
+            </permissions>
+        </role>
+
+    </roles>
+
+    <users>
+        <user id="1">
+            <name>Mario</name>
+            <roles>
+                <role status="active">1</role>
+                <role status="active">2</role>
+            </roles>
+        </user>
+    </users>
+
+</session>
