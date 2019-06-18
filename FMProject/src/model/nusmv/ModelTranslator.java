@@ -122,6 +122,7 @@ public class ModelTranslator {
 
 
         nusmvCode = nusmvCode.concat(mainModule);
+        nusmvCode = nusmvCode.concat(generateLTLFormula());
         return nusmvCode;
     }
 
@@ -272,19 +273,16 @@ public class ModelTranslator {
                 new String[]{"id"});
     }
 
-
-    Session session= new Session(null);
-
     /*Rule of assignment:
      *
      *verify that all users that can execute an operation have an active role
      * */
-    private String roass(){
+    private static String rulesOfAssignement(){
         String result="";
         for (User u : session.getUsers()) {
             result += "LTLSPEC\n" +
                     "G (u"+u.getUserId()+".activePerm != 0 -> (";
-            for (Role r : session.getRoles()){
+            for (Role r : roles){
                 result += "ur"+u.getUserId()+"_"+r.getRoleId()+".active = TRUE | ";
             }
             result += "FALSE));\n";
@@ -296,10 +294,10 @@ public class ModelTranslator {
      *
      *verify that all the active roles of users are also authorized
      * */
-    private String roaut(){
+    private static String rulesOfAuthorization(){
         String result="";
         for (User u : session.getUsers()) {
-            for (Role r : session.getRoles()){
+            for (Role r : roles){
                 result += "LTLSPEC\n" +
                         "G !( ur"+u.getUserId()+"_"+r.getRoleId()+".active = TRUE & " +
                         "ur"+u.getUserId()+"_"+r.getRoleId()+".status = notAut );\n";
@@ -312,14 +310,14 @@ public class ModelTranslator {
      *
      *verify that operations executed by users are always authorized for the active role
      * */
-    private String rota(){
+    private static String roleOfTransactionAuthorization(){
         String result="";
         for (User u : session.getUsers()) {
             result += "LTLSPEC\n" +
                     "G (u" + u.getUserId() + ".activePerm = 0 | u" + u.getUserId() + ".activePerm in (";
-            for (Role r : session.getRoles()){
+            for (Role r : roles){
                 result += " (ur"+u.getUserId()+"_"+r.getRoleId()+".status = NoAut ? 0 : ( ";
-                for (Permission p : session.getPermissions) {
+                for (Permission p : permissions) {
                     result += "(rp"+r.getRoleId()+"_"+p.getId()+".boolean ? p"+p.getId()+".permid : 0 )  union ";
                 }
                 result += "0 ) ) union ";
@@ -329,14 +327,14 @@ public class ModelTranslator {
         return result;
     }
 
-    Versione per il caso di assegnamenti Ruoli-permessi immmodificabili
+    // Versione per il caso di assegnamenti Ruoli-permessi immmodificabili
 
-    private String rota(){
+    private static String roleOfTransactionAuthorizationImmutable(){
         String result="";
         for (User u : session.getUsers()) {
             result += "LTLSPEC\n" +
                     "G (u" + u.getUserId() + ".activePerm = 0 | u" + u.getUserId() + ".activePerm in (";
-            for (Role r : session.getRoles()){
+            for (Role r : roles){
                 result += " (ur"+u.getUserId()+"_"+r.getRoleId()+".status = NoAut ? 0 : ( ";
                 for (Permission p : r.getPermissionList()) {
                     result += "p"+p.getId()+".permid union ";
@@ -349,11 +347,11 @@ public class ModelTranslator {
     }
 
 
-    public String generateLTLFormula(){
+    private static String generateLTLFormula(){
         String result="";
-        result += roass();
-        result += roaut();
-        result += rota();
+        result += rulesOfAssignement();
+        result += rulesOfAuthorization();
+        result += roleOfTransactionAuthorizationImmutable();
 
         return result;
     }
