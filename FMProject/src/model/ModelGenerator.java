@@ -24,6 +24,11 @@ public class ModelGenerator {
     // lista degli utenti nel sistema
     private static ArrayList<User> UserList = new ArrayList<>();
 
+    // lista dei permessi nel sistema
+    private static ArrayList<Permission> PermissionList = new ArrayList<>();
+
+
+
 
     private static void parseStream(Node node, int level, String type){
 
@@ -103,6 +108,9 @@ public class ModelGenerator {
                             // createPermission mi crea e ritorna l'oggetto permesso conoscendo l'id dell'oggetto, dell'operazione e del nuovo permesso
                             Permission p = createPermission(RBACObjectId,OperationId,PermissionId);
 
+                            // aggiungo il permesso alla lista dei permessi nel sistema
+                            PermissionList.add(p);
+
                             System.out.println(" new PERMISSION: " + "\n        id = " + p.getId() + "\n        object_id = " + p.getRBACObject().getObjectId() + "\n        operation_id = " + p.getOperation().getOperationId() + "\n");
                         }
                         //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -117,7 +125,7 @@ public class ModelGenerator {
                             String RoleName = element.getChildNodes().item(1).getTextContent();
 
                             // istanzio la lista dei permessi
-                            ArrayList<Permission> PermissionList = new ArrayList<>();
+                            ArrayList<Permission> RolePermissionList = new ArrayList<>();
 
                             Role r = new Role(RoleId, RoleName, new ArrayList<>());
 
@@ -135,24 +143,22 @@ public class ModelGenerator {
                                     // mi ricavo l'id del permesso
                                     int PermissionId = Integer.parseInt(permissions.getChildNodes().item(k).getAttributes().item(0).getTextContent());
 
-                                    // mi ricavo l'id dell'oggetto associato al permesso
-                                    int RBACObjectId = Integer.parseInt(permissions.getChildNodes().item(k).getChildNodes().item(1).getTextContent());
-
-                                    // mi ricavo l'id dell'operazione associata al permesso
-                                    int OperationId = Integer.parseInt(permissions.getChildNodes().item(k).getChildNodes().item(3).getTextContent());
-
-                                    // createPermission mi ricostruisce e ritorna l'oggetto permesso conoscendo l'id dell'oggetto, dell'operazione e del nuovo permesso
-                                    Permission p = createPermission(RBACObjectId,OperationId,PermissionId);
+                                    // mi restituisce l'oggetto permesso conoscendone l'id
+                                    for (Permission p: PermissionList) {
+                                        if(p.getId() == PermissionId) {
+                                            RolePermissionList.add(p);
+                                            outPermission.append("        permission added to the role: " + "\n                   permission_id = ").append(p.getId()).append("\n         " +
+                                                    "          object_id = ").append(p.getRBACObject().getObjectId()).append("\n                   operation_id = ").append(p.getOperation().getOperationId()).append("\n");
+                                        }
+                                    }
 
                                     // aggiorno il ruolo r con la lista dei permessi associati
-                                    PermissionList.add(p);
-                                    r.setPermissionList(PermissionList);
+                                    r.setPermissionList(RolePermissionList);
 
                                     // aggiungo il ruolo r alla lista dei ruoli
                                     RoleList.add(r);
 
-                                    outPermission.append("        permission added to the role: " + "\n                   permission_id = ").append(p.getId()).append("\n         " +
-                                            "          object_id = ").append(p.getRBACObject().getObjectId()).append("\n                   operation_id = ").append(p.getOperation().getOperationId()).append("\n");
+
                                 }
                             }
 
@@ -191,7 +197,6 @@ public class ModelGenerator {
                                         if(RoleId == r.getRoleId()) {
 
                                             if (!UserRoleList.contains(r)) {
-
                                                 UserRoleList.add(r);
                                                 outUser.append("        authorized role added to the user: " + "\n                   role_id = ").append(r.getRoleId()).append("\n                   role_name = ").append(r.getRoleName()).append("\n");
 
@@ -241,8 +246,8 @@ public class ModelGenerator {
 
     // main per testing della classe
     public static void main(String[] args) throws Exception {
-        createSession("C:\\Users\\theje\\IdeaProjects\\ProjectFM\\FMProject\\base.xml");
-        System.out.println("##############################" + UserList.size());
+        createSession("C:\\Users\\theje\\IdeaProjects\\ProjectFM\\FMProject\\hospital.xml");
+        System.out.println("####################" + RoleList.size() + "    ");
     }
 
     // Metodo che richiama un lettore per file xml e crea una sessione con i dati estrapolati
