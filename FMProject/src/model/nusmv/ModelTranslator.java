@@ -302,8 +302,8 @@ public class ModelTranslator {
         ArrayList<Role> rolesUser2 = new ArrayList<>();
         rolesUser2.add(medico);
 
-        User user1 = new User(0, "mario", rolesUser1, amministrazione, scriviCartelle);
-        User user2 = new User(1, "alice", rolesUser2, medico, leggiDati);
+        User user1 = new User(0, "mario", rolesUser1, amministrazione, permessoScritturaCartelle);
+        User user2 = new User(1, "alice", rolesUser2, medico, permessoLetturaDati);
 
         ArrayList<User> users = new ArrayList<>();
         users.add(user1);
