@@ -131,12 +131,7 @@ public class ModelTranslator {
      */
     private static void initializeLists() {
         users = session.getUsers();
-
-        for(User user : users){
-            for(Role role : user.getAuthRoles()){
-                if(!roles.contains(role)) roles.add(role);
-            }
-        }
+        roles = session.getRoles();
 
         for(Role role : roles){
             for(Permission permission : role.getPermissionList()){
@@ -273,37 +268,36 @@ public class ModelTranslator {
                 new String[]{"id"});
     }
 
-    /*Rule of assignment:
-     *
-     *verify that all users that can execute an operation have an active role
-     * */
+    /**
+     * Writes the rule of assignement to verify that all users that can execute
+     * have an active role.
+     * @return the LTL formula
+     */
     private static String rulesOfAssignement(){
-        String result="";
+        StringBuilder result= new StringBuilder();
         for (User u : session.getUsers()) {
-            result += "LTLSPEC\n" +
-                    "G (u"+u.getUserId()+".activePerm != 0 -> (";
+            result.append("LTLSPEC\n" + "G (u").append(u.getUserId()).append(".activePerm != 0 -> (");
             for (Role r : roles){
-                result += "ur"+u.getUserId()+"_"+r.getRoleId()+".active = TRUE | ";
+                result.append("ur").append(u.getUserId()).append("_").append(r.getRoleId()).append(".active = TRUE | ");
             }
-            result += "FALSE));\n";
+            result.append("FALSE));\n");
         }
-        return result;
+        return result.toString();
     }
 
-    /*Rule of authorization:
-     *
-     *verify that all the active roles of users are also authorized
-     * */
+    /**
+     * The method writes the rules of authorization. They verify that all active roles of users
+     * are also authorized.
+     * @return the LTL formula
+     */
     private static String rulesOfAuthorization(){
-        String result="";
+        StringBuilder result= new StringBuilder();
         for (User u : session.getUsers()) {
             for (Role r : roles){
-                result += "LTLSPEC\n" +
-                        "G !( ur"+u.getUserId()+"_"+r.getRoleId()+".active = TRUE & " +
-                        "ur"+u.getUserId()+"_"+r.getRoleId()+".status = notAut );\n";
+                result.append("LTLSPEC\n" + "G !( ur").append(u.getUserId()).append("_").append(r.getRoleId()).append(".active = TRUE & ").append("ur").append(u.getUserId()).append("_").append(r.getRoleId()).append(".status = notAut );\n");
             }
         }
-        return result;
+        return result.toString();
     }
 
     /*Rule of transaction authorization:
@@ -311,44 +305,47 @@ public class ModelTranslator {
      *verify that operations executed by users are always authorized for the active role
      * */
     private static String roleOfTransactionAuthorization(){
-        String result="";
+        StringBuilder result= new StringBuilder();
         for (User u : session.getUsers()) {
-            result += "LTLSPEC\n" +
-                    "G (u" + u.getUserId() + ".activePerm = 0 | u" + u.getUserId() + ".activePerm in (";
+            result.append("LTLSPEC\n" + "G (u").append(u.getUserId()).append(".activePerm = 0 | u").append(u.getUserId()).append(".activePerm in (");
             for (Role r : roles){
-                result += " (ur"+u.getUserId()+"_"+r.getRoleId()+".status = NoAut ? 0 : ( ";
+                result.append(" (ur").append(u.getUserId()).append("_").append(r.getRoleId()).append(".status = NoAut ? 0 : ( ");
                 for (Permission p : permissions) {
-                    result += "(rp"+r.getRoleId()+"_"+p.getId()+".boolean ? p"+p.getId()+".permid : 0 )  union ";
+                    result.append("(rp").append(r.getRoleId()).append("_").append(p.getId()).append(".boolean ? p").append(p.getId()).append(".permid : 0 )  union ");
                 }
-                result += "0 ) ) union ";
+                result.append("0 ) ) union ");
             }
-            result += " 0 ) );\n";
+            result.append(" 0 ) );\n");
         }
-        return result;
+        return result.toString();
     }
 
     // Versione per il caso di assegnamenti Ruoli-permessi immmodificabili
 
     private static String roleOfTransactionAuthorizationImmutable(){
-        String result="";
+        StringBuilder result= new StringBuilder();
         for (User u : session.getUsers()) {
-            result += "LTLSPEC\n" +
-                    "G (u" + u.getUserId() + ".activePerm = 0 | u" + u.getUserId() + ".activePerm in (";
+            result.append(
+                    "LTLSPEC\n" + "G (u").
+                    append(u.getUserId()).
+                    append(".activePerm = 0 | u").
+                    append(u.getUserId()).
+                    append(".activePerm in (");
             for (Role r : roles){
-                result += " (ur"+u.getUserId()+"_"+r.getRoleId()+".status = NoAut ? 0 : ( ";
+                result.append(" (ur").append(u.getUserId()).append("_").append(r.getRoleId()).append(".status = NoAut ? 0 : ( ");
                 for (Permission p : r.getPermissionList()) {
-                    result += "p"+p.getId()+".permid union ";
+                    result.append("p").append(p.getId()).append(".permid union ");
                 }
-                result += "0 ) ) union ";
+                result.append("0 ) ) union ");
             }
-            result += " 0 ) );\n";
+            result.append(" 0 ) );\n");
         }
-        return result;
+        return result.toString();
     }
 
 
     private static String generateLTLFormula(){
-        String result="";
+        String result = "";
         result += rulesOfAssignement();
         result += rulesOfAuthorization();
         result += roleOfTransactionAuthorizationImmutable();
@@ -380,6 +377,10 @@ public class ModelTranslator {
         Role amministrazione = new Role(0, "amministrazione", permessiAmministrazione);
         Role medico = new Role(1, "medico", permessiMedico);
 
+        ArrayList<Role> roles = new ArrayList<>();
+        roles.add(amministrazione);
+        roles.add(medico);
+
         ArrayList<Role> rolesUser1 = new ArrayList<>();
         rolesUser1.add(amministrazione);
 
@@ -393,7 +394,7 @@ public class ModelTranslator {
         users.add(user1);
         users.add(user2);
 
-        session = new Session(users);
+        session = new Session(users, roles);
 
         String code = fromModelToNuSMV("");
         System.out.println(code);
