@@ -154,13 +154,11 @@ public class ModelGenerator {
 
                                     // aggiorno il ruolo r con la lista dei permessi associati
                                     r.setPermissionList(RolePermissionList);
-
-                                    // aggiungo il ruolo r alla lista dei ruoli del sistema
-                                    RoleList.add(r);
-
-
                                 }
                             }
+
+                            // aggiungo il ruolo r alla lista dei ruoli del sistema
+                            RoleList.add(r);
 
                             System.out.println(" new ROLE: " + "\n        id = " + r.getRoleId() + "\n        name = " + r.getRoleName() + "\n" + outPermission);
 
@@ -247,7 +245,6 @@ public class ModelGenerator {
     // main per testing della classe
     public static void main(String[] args) throws Exception {
         createSession("C:\\Users\\theje\\IdeaProjects\\ProjectFM\\FMProject\\hospital.xml");
-        System.out.println("####################" + RoleList.size() + "    ");
     }
 
     // Metodo che richiama un lettore per file xml e crea una sessione con i dati estrapolati
