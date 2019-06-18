@@ -193,7 +193,7 @@ public class ModelTranslator {
     private static String generateUserModule(){
         return generateModule("user",
                 new String[]{"id", "activePerm"},
-                new String[]{"0..100", "0.." + operations.size()},
+                new String[]{"0.." + roles.size(), "0.." + operations.size()},
                 new String[]{"id", "activePerm"},
                 new String[]{"id", "activePerm"});
     }
@@ -206,7 +206,7 @@ public class ModelTranslator {
         return generateModule(
                 "role",
                 new String[]{"id"},
-                new String[]{"0..100"},
+                new String[]{"0.." + roles.size()},
                 new String[]{"id"},
                 new String[]{"id"});
     }
@@ -218,7 +218,7 @@ public class ModelTranslator {
     private static String generateUserRoleModule(){
         return generateModule("userRole",
                 new String[]{"user", "role", "active", "status"}, // variables
-                new String[]{"0..100", "0..100", "boolean", "{Aut, NoAut}"}, // domains
+                new String[]{"0.." + users.size(), "0.." + roles.size(), "boolean", "{Aut, NoAut}"}, // domains
                 new String[]{"user", "role", "active", "Aut"}, //init
                 new String[]{"user", "role", "active", "{Aut, NoAut}"}); //next
     }
@@ -231,7 +231,7 @@ public class ModelTranslator {
         return generateModule(
                 "permission",
                 new String[]{"permid", "operid", "objectid"},
-                new String[]{"0..100", "0..100", "0..100"},
+                new String[]{"0.." + permissions.size(), "0.." + operations.size(), "0.." + objects.size()},
                 new String[]{"permid", "operid", "objectid"},
                 new String[]{"permid", "operid", "objectid"});
     }
@@ -240,7 +240,7 @@ public class ModelTranslator {
         return generateModule(
                 "rolePermission",
                 new String[]{"roleId", "permId"},
-                new String[]{"0..100", "0..100"},
+                new String[]{"0.." + roles.size(), "0.." + permissions.size()},
                 new String[]{"roleId", "permId"},
                 new String[]{"roleId", "permId"}
         );
@@ -254,7 +254,7 @@ public class ModelTranslator {
         return generateModule(
                 "object",
                 new String[]{"id"},
-                new String[]{"0..100"},
+                new String[]{"0.." + objects.size()},
                 new String[]{"id"},
                 new String[]{"id"});
     }
