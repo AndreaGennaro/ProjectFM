@@ -195,6 +195,7 @@ public class ModelGenerator {
                                     int RoleId = Integer.parseInt(roles.getChildNodes().item(k).getChildNodes().item(0).getTextContent());
                                     String status = roles.getChildNodes().item(k).getAttributes().item(0).getTextContent();
 
+                                    // Verifichiamo che il ruolo è attivo. In tal caso lo passiamo all'utente
                                     if(status.equals("active")){
                                         for(Role role : RoleList){
                                             if(role.getRoleId() == RoleId){
@@ -216,9 +217,9 @@ public class ModelGenerator {
                                 }
                             }
 
-                            //DA FINIRE POI CON LOROOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
-                            // ruolo attivo e operazione a cavolo!!!
-                            UserList.add( new User(UserId, UserName, UserRoleList, activeRoleForUser, activeRoleForUser.getPermissionList().get(0)) );
+                            // Creazione utente
+                            UserList.add(
+                                    new User(UserId, UserName, UserRoleList, activeRoleForUser, activeRoleForUser.getPermissionList().get(0)) );
 
                             System.out.println(" new USER: " + "\n        id = " + UserId + "\n        name = " + UserName + "\n" + outUser);
                         }
