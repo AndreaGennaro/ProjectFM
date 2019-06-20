@@ -76,10 +76,10 @@ public class ModelTranslator {
                 String userIdStr = String.valueOf(user.getUserId());
                 for (Role role : user.getAuthRoles()) {
                     String roleIdStr = String.valueOf(role.getRoleId());
-                    String activeStr = String.valueOf(user.getActiveRole().getRoleId() == role.getRoleId());
+                    String activeStr = String.valueOf(user.getActiveRole().getRoleId() == role.getRoleId()).toUpperCase();
 
                     String var = tabSpace + tabSpace + "ur" + userIdStr + "_" + roleIdStr + " : userRole(" +
-                            userIdStr + ", " + roleIdStr + ", " + activeStr + "); " +
+                            userIdStr + ", " + roleIdStr + ", " + activeStr + ", Aut); " +
                             "-- (" + user.getUserName() + ", " + role.getRoleName() + ")\n";
                     mainModule = mainModule.concat(var);
 
@@ -221,9 +221,9 @@ public class ModelTranslator {
     private static String generateUserRoleModule(){
         return generateModule("userRole",
                 new String[]{"user", "role", "active", "status"}, // variables
-                new String[]{"0.." + users.size(), "0.." + roles.size(), "boolean", "{Aut, NoAut}"}, // domains
-                new String[]{"user", "role", "active", "Aut"}, //init
-                new String[]{"user", "role", "active", "{Aut, NoAut}"}); //next
+                new String[]{"0.." + users.size(), "0.." + roles.size(), "boolean", "{Aut, notAut}"}, // domains
+                new String[]{"user", "role", "active", "status"}, //init
+                new String[]{"user", "role", "active", "{Aut, notAut}"}); //next
     }
 
     /**
@@ -283,8 +283,8 @@ public class ModelTranslator {
     private static String rulesOfAssignement(){
         StringBuilder result= new StringBuilder();
         for (User u : session.getUsers()) {
-            result.append("LTLSPEC\n" + "G (u").append(u.getUserId()).append(".activePerm != 0 -> (");
-            for (Role r : roles){
+            result.append(tabSpace + "LTLSPEC\n" + tabSpace + "G (user").append(u.getUserId()).append(".activePerm != 0 -> (");
+            for (Role r : u.getAuthRoles()){
                 result.append("ur").append(u.getUserId()).append("_").append(r.getRoleId()).append(".active = TRUE | ");
             }
             result.append("FALSE));\n");
@@ -300,8 +300,8 @@ public class ModelTranslator {
     private static String rulesOfAuthorization(){
         StringBuilder result= new StringBuilder();
         for (User u : session.getUsers()) {
-            for (Role r : roles){
-                result.append("LTLSPEC\n" + "G !( ur").append(u.getUserId()).append("_").append(r.getRoleId()).append(".active = TRUE & ").append("ur").append(u.getUserId()).append("_").append(r.getRoleId()).append(".status = notAut );\n");
+            for (Role r : u.getAuthRoles()){
+                result.append(tabSpace + "LTLSPEC\n" + tabSpace + "G !( ur").append(u.getUserId()).append("_").append(r.getRoleId()).append(".active = TRUE & ").append("ur").append(u.getUserId()).append("_").append(r.getRoleId()).append(".status = notAut );\n");
             }
         }
         return result.toString();
@@ -314,11 +314,11 @@ public class ModelTranslator {
     private static String roleOfTransactionAuthorization(){
         StringBuilder result= new StringBuilder();
         for (User u : session.getUsers()) {
-            result.append("LTLSPEC\n" + "G (u").append(u.getUserId()).append(".activePerm = 0 | u").append(u.getUserId()).append(".activePerm in (");
+            result.append("LTLSPEC\n" + "G (user").append(u.getUserId()).append(".activePerm = 0 | user").append(u.getUserId()).append(".activePerm in (");
             for (Role r : roles){
                 result.append(" (ur").append(u.getUserId()).append("_").append(r.getRoleId()).append(".status = NoAut ? 0 : ( ");
                 for (Permission p : permissions) {
-                    result.append("(rp").append(r.getRoleId()).append("_").append(p.getId()).append(".boolean ? p").append(p.getId()).append(".permid : 0 )  union ");
+                    result.append("(rp").append(r.getRoleId()).append("_").append(p.getId()).append(".boolean ? permission").append(p.getId()).append(".permid : 0 )  union ");
                 }
                 result.append("0 ) ) union ");
             }
@@ -333,15 +333,15 @@ public class ModelTranslator {
         StringBuilder result= new StringBuilder();
         for (User u : session.getUsers()) {
             result.append(
-                    "LTLSPEC\n" + "G (u").
+                    tabSpace + "LTLSPEC\n" + tabSpace + "G (user").
                     append(u.getUserId()).
-                    append(".activePerm = 0 | u").
+                    append(".activePerm = 0 | user").
                     append(u.getUserId()).
                     append(".activePerm in (");
-            for (Role r : roles){
-                result.append(" (ur").append(u.getUserId()).append("_").append(r.getRoleId()).append(".status = NoAut ? 0 : ( ");
+            for (Role r : u.getAuthRoles()){
+                result.append(" (ur").append(u.getUserId()).append("_").append(r.getRoleId()).append(".status = notAut ? 0 : ( ");
                 for (Permission p : r.getPermissionList()) {
-                    result.append("p").append(p.getId()).append(".permid union ");
+                    result.append("permission").append(p.getId()).append(".permid union ");
                 }
                 result.append("0 ) ) union ");
             }
