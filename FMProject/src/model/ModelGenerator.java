@@ -154,11 +154,13 @@ public class ModelGenerator {
 
                                     // aggiorno il ruolo r con la lista dei permessi associati
                                     r.setPermissionList(RolePermissionList);
+
+                                    // aggiungo il ruolo r alla lista dei ruoli del sistema
+                                    RoleList.add(r);
+
+
                                 }
                             }
-
-                            // aggiungo il ruolo r alla lista dei ruoli del sistema
-                            RoleList.add(r);
 
                             System.out.println(" new ROLE: " + "\n        id = " + r.getRoleId() + "\n        name = " + r.getRoleName() + "\n" + outPermission);
 
@@ -182,6 +184,8 @@ public class ModelGenerator {
 
                             StringBuilder outUser = new StringBuilder();
 
+                            Role activeRoleForUser = new Role(0, "", new ArrayList<>());
+
                             // mi ricavo la lista dei ruoli associati all'utente
                             for (int k = 0; k < roles.getChildNodes().getLength(); k++) {
 
@@ -189,11 +193,19 @@ public class ModelGenerator {
                                     // considero il k-esimo figlio dell'elemento roles, ovvero il k-esimo ruolo tra quelli associati all'utente
                                     // mi ricavo l'id del ruolo
                                     int RoleId = Integer.parseInt(roles.getChildNodes().item(k).getChildNodes().item(0).getTextContent());
+                                    String status = roles.getChildNodes().item(k).getAttributes().item(0).getTextContent();
+
+                                    if(status.equals("active")){
+                                        for(Role role : RoleList){
+                                            if(role.getRoleId() == RoleId){
+                                                activeRoleForUser = role;
+                                            }
+                                        }
+                                    }
 
                                     // aggiungo alla lista dei ruoli dell'utente il ruolo il cui id è scritto nell'xml
                                     for (Role r: RoleList) {
                                         if(RoleId == r.getRoleId()) {
-
                                             if (!UserRoleList.contains(r)) {
                                                 UserRoleList.add(r);
                                                 outUser.append("        authorized role added to the user: " + "\n                   role_id = ").append(r.getRoleId()).append("\n                   role_name = ").append(r.getRoleName()).append("\n");
@@ -206,7 +218,7 @@ public class ModelGenerator {
 
                             //DA FINIRE POI CON LOROOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
                             // ruolo attivo e operazione a cavolo!!!
-                            UserList.add( new User(UserId, UserName, UserRoleList, UserRoleList.get(0), UserRoleList.get(0).getPermissionList().get(0)) );
+                            UserList.add( new User(UserId, UserName, UserRoleList, activeRoleForUser, activeRoleForUser.getPermissionList().get(0)) );
 
                             System.out.println(" new USER: " + "\n        id = " + UserId + "\n        name = " + UserName + "\n" + outUser);
                         }
@@ -245,6 +257,7 @@ public class ModelGenerator {
     // main per testing della classe
     public static void main(String[] args) throws Exception {
         createSession("C:\\Users\\theje\\IdeaProjects\\ProjectFM\\FMProject\\hospital.xml");
+        System.out.println("####################" + RoleList.size() + "    ");
     }
 
     // Metodo che richiama un lettore per file xml e crea una sessione con i dati estrapolati
