@@ -223,7 +223,7 @@ public class ModelTranslator {
                 new String[]{"user", "role", "active", "status"}, // variables
                 new String[]{"0.." + users.size(), "0.." + roles.size(), "boolean", "{Aut, notAut}"}, // domains
                 new String[]{"user", "role", "active", "status"}, //init
-                new String[]{"user", "role", "active", "{Aut, notAut}"}); //next
+                new String[]{"user", "role", "{TRUE, FALSE}", "{Aut, notAut}"}); //next
     }
 
     /**
