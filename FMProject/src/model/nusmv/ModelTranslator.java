@@ -316,7 +316,7 @@ public class ModelTranslator {
         for (User u : session.getUsers()) {
             result.append("LTLSPEC\n" + "G (user").append(u.getUserId()).append(".activePerm = 0 | user").append(u.getUserId()).append(".activePerm in (");
             for (Role r : roles){
-                result.append(" (ur").append(u.getUserId()).append("_").append(r.getRoleId()).append(".status = NoAut ? 0 : ( ");
+                result.append(" (ur").append(u.getUserId()).append("_").append(r.getRoleId()).append(".active = FALSE ? 0 : ( ");
                 for (Permission p : permissions) {
                     result.append("(rp").append(r.getRoleId()).append("_").append(p.getId()).append(".boolean ? permission").append(p.getId()).append(".permid : 0 )  union ");
                 }
@@ -339,7 +339,7 @@ public class ModelTranslator {
                     append(u.getUserId()).
                     append(".activePerm in (");
             for (Role r : u.getAuthRoles()){
-                result.append(" (ur").append(u.getUserId()).append("_").append(r.getRoleId()).append(".status = notAut ? 0 : ( ");
+                result.append(" (ur").append(u.getUserId()).append("_").append(r.getRoleId()).append(".active = FALSE ? 0 : ( ");
                 for (Permission p : r.getPermissionList()) {
                     result.append("permission").append(p.getId()).append(".permid union ");
                 }
